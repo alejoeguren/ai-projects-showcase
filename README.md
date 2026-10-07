@@ -15,6 +15,7 @@ Some of these are real, working systems I use every week. Others are prototypes 
 | [Website Audit](projects/website-audit/) | **Working tool** | "Audit example.com" produces an interactive report on SEO, AI-search visibility, speed, mobile, and messaging, plus competitor comparisons. | Node, Puppeteer, Lighthouse, Claude |
 | [Flowcraft](projects/flowcraft/) | **Working tool** | Interviews you about a business process and outputs a swimlane diagram, a RACI chart (who does what), and recommended fixes. One HTML file with no setup. | Vanilla JS |
 | [Cherry Bean](projects/cherry-bean/) ☕ | **Prototype** | Photograph a coffee bag; the app reads it with AI and pins the origin region and the roaster on a map, building your palate as a map over time. | Expo / React Native, Claude vision |
+| [Client work](client-work/) | **In use by clients** | Described only (the code is client-owned): two weekly analytics systems connecting GA4, Google Business Profile, Metricool, and AI-search probes, plus persona landing pages. All three were built in about two months. | Python, Google APIs, MCP, Claude scheduled tasks |
 | [Wisper](projects/wisper/) | **Prototype** | My own voice-dictation tool for Windows: hold a key, talk, and cleaned-up text appears wherever you're typing. | Python, local Whisper, Claude |
 
 ## A few things worth a closer look
@@ -39,7 +40,7 @@ Some starting ideas. The right ones depend on where your team's time actually go
 - **Grade conversations against a standard.** The coaching grader works for any transcript: café or barista training, wholesale sales calls, customer service.
 - **Map a process before automating it.** Flowcraft is how I'd start: draw the current workflow, find the handoffs and bottlenecks, then decide what AI should take on.
 - **Recurring content with an approval gate.** The Vitals & Signals pipeline works for a newsletter, an origin story per release, or social posts. AI drafts it and you approve it.
-- **Weekly reporting without the busywork.** I've built dashboards for clients that pull from marketing and analytics tools into one weekly view. They're not included here because they belong to clients, but the pattern is easy to reuse.
+- **Weekly reporting without the busywork.** See [client work](client-work/): connecting the tools a business already uses (Google Analytics, Google Business Profile, social tools, Sheets) into one report that builds itself every week.
 - **See how you show up in AI search.** Website Audit checks whether ChatGPT, Claude, and Perplexity can find and cite your site.
 
 ## Notes on this repo

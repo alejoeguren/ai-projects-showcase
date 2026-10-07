@@ -17,16 +17,16 @@ Coaching session recorded → transcript lands in my Notes database (Type = Coac
 
 ## The rubric (v1.0)
 
-Six competencies, each scored 1–5 from **observable transcript behavior**, rolled up into an overall score out of 100:
+Six weighted competencies, each scored 1.0–5.0 from **observable transcript behavior**. The overall score is the weighted average × 20, out of 100. The full anchors (what a 1, 3, and 5 look like) are in [`agent-instructions.md`](agent-instructions.md).
 
-| Competency | What it looks for |
-|---|---|
-| Contracting & Focus | Did the session agree on what the client wants out of it? |
-| Listening & Curiosity | Reflecting back, following the client's thread rather than mine |
-| Questions & Awareness | Open, non-leading questions that create new thinking |
-| Challenge & Depth | Willingness to push on assumptions, not just reassure |
-| Client Ownership | Did the *client* generate the insight and the decision? |
-| Action & Accountability | A clear commitment and a way to follow up |
+| Competency | Weight | What it looks for |
+|---|---|---|
+| Contracting & Focus | 10% | Did the session agree on what the client wants out of it? |
+| Listening & Curiosity | 20% | Following the client's language and exploring before interpreting |
+| Questions & Awareness | 25% | Short, open, non-leading questions that create new thinking. "Have you thought about X?" counts as advice. |
+| Challenge & Depth | 15% | Respectfully testing assumptions, contradictions, and avoidance |
+| Client Ownership | 20% | Did the *client* generate the options, the decision, and the action? |
+| Action & Accountability | 10% | Learning turned into a specific, client-owned next step |
 
 **Calibration rules:** 3 means competent, 4 is clearly strong, and 5 should be rare. Every score cites transcript evidence.
 
@@ -37,6 +37,10 @@ Much of my coaching mixes in operator advice. A naive grader would mark down eve
 - **Was the mode switch clear?** Yes / Partially / No / Not necessary
 - **Effect:** Helpful / Neutral / Counterproductive
 - Did it add expertise and unblock the client, or did it solve the problem prematurely and take ownership away?
+
+## The agent's instructions
+
+The complete instructions the agent runs with are in [`agent-instructions.md`](agent-instructions.md): eligibility gates, evaluation philosophy, the full rubric, required properties, review body, dashboard update, and completion behavior. That one page is the whole agent.
 
 ## What each review contains
 
