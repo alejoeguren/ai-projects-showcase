@@ -1,0 +1,12 @@
+{
+  "hotkey": "f8",
+  "hotkey_mode": "hold",
+  "whisper_model": "base",
+  "whisper_device": "cpu",
+  "whisper_compute_type": "int8",
+  "language": null,
+  "ai_cleanup": true,
+  "cleanup_model": "claude-haiku-4-5-20251001",
+  "snippets_enabled": true,
+  "sounds": true
+}

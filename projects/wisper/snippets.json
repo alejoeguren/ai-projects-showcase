@@ -1,0 +1,6 @@
+{
+  "'cal": "https://calendar.google.com/calendar/u/0/r",
+  "'email": "you@example.com",
+  "'date": "{date}",
+  "'time": "{time}"
+}

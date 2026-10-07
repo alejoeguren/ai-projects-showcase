@@ -1,0 +1,14 @@
+# MBA Prep Pro
+
+> AI-powered MBA mock interviews tailored to your target business schools. Practice with realistic interviewers, get detailed feedback, and track your progress across schools like HBS, Wharton, Stanford GSB, Yale SOM, and more.
+
+MBA Prep Pro helps MBA applicants prepare for admissions interviews through realistic AI-driven mock sessions, school-specific question banks, and structured scoring on substance, structure, and presence.
+
+## Pages
+
+- [Home](/): Overview of MBA Prep Pro and how AI-powered MBA mock interviews work.
+- [Learn More](/learn-more): Step-by-step explanation of the practice and feedback flow.
+- [Pricing](/pricing): Essential, Professional, and Premium plans plus add-on interviews.
+- [Blog](/blog): Articles on MBA interview prep, school-specific tips, and admissions strategy.
+- [MBA Interview Questions](/mba-interview-questions): The 16 most common MBA interview questions with guidance on strong answers.
+- [Sign in / Sign up](/auth): Create an account or sign in to start practicing.

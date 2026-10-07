@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:content="http://purl.org/rss/modules/content/">
+  <channel>
+    <title>Vitals &amp; Signals</title>
+    <link>https://alejoeguren.github.io/vitals-and-signals/</link>
+    <description>I started Vitals &amp; Signals because I needed a better way to stay current at the intersection of AI and healthcare — so I built one. Every week, I use AI to research, write, and produce this show: scanning the news, following the money, and flagging what actually matters. What started as a personal tool became something worth sharing. If you&apos;re a founder, investor, clinician, or just AI-curious, this is your weekly briefing — built by a guy who wanted one and couldn&apos;t find it.</description>
+    <language>en-us</language>
+    <itunes:author>Vitals &amp; Signals</itunes:author>
+    <itunes:category text="Technology"/>
+    <itunes:category text="Health &amp; Fitness">
+      <itunes:category text="Medicine"/>
+    </itunes:category>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:type>episodic</itunes:type>
+    <itunes:image href="https://raw.githubusercontent.com/alejoeguren/vitals-and-signals/main/cover.png"/>
+    <itunes:owner>
+      <itunes:email>podcast@example.com</itunes:email>
+    </itunes:owner>
+    <managingEditor>podcast@example.com</managingEditor>
+  
+  
+  
+  
+  
+
+  
+  
+  
+  <item>
+    <title>Ep. 007 — Mayo Clinic Just Became a Global AI Platform Company</title>
+    <description>When Mayo Clinic owns the model and Microsoft owns the pipes, a nonprofit hospital just became a global AI platform company — and the IP deal structure they invented this week will be copied by every health system that has data worth training on.</description>
+    <pubDate>Mon, 08 Jun 2026 10:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep007/ep007-podcast-2026-06-06.mp3" length="15773804" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep007</guid>
+    <itunes:episode>7</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 006 — The $165 Billion AI Payment Rail Nobody Noticed</title>
+    <description>The government just built the first payment rail explicitly designed for AI agents managing chronic disease — and it goes live in six weeks, designed by former VCs now inside CMS, with 165 million commercial lives already pledged to follow, and almost nobody in tech is paying attention.</description>
+    <pubDate>Mon, 25 May 2026 10:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep006/ep006-podcast-2026-05-25.mp3" length="18089324" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep006</guid>
+    <itunes:episode>6</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 005 — The Government Will Pay AI Only If You Get Healthier</title>
+    <description>On July 5, the federal government will start paying AI companies only if their patients actually get healthier — and almost nobody outside healthcare has noticed yet.</description>
+    <pubDate>Thu, 14 May 2026 10:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep005/ep005-podcast-2026-05-14.mp3" length="15029228" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep005</guid>
+    <itunes:episode>5</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 004 — The Same AI That Heals You Can Hack You</title>
+    <description>Physicians are already building their own clinical tools — responsibly, with patient privacy designed in from day one. The question isn&apos;t whether they should. It&apos;s whether the EHRs, the hospitals, and a privacy law written in 1996 for a fax-first world will open up to meet them — or keep forcing innovation to happen in the shadows.</description>
+    <pubDate>Mon, 27 Apr 2026 10:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep004/ep004-podcast-2026-04-26.mp3" length="15634796" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep004</guid>
+    <itunes:episode>4</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 003 — The Ambient AI Scribe Billing Bombshell Payers Have Been Waiting For</title>
+    <description>The ambient AI scribe industry sold itself on burnout relief — but the dirty secret hiding in plain sight is that better documentation means higher billing codes, and a peer-reviewed JAMA paper plus a $2.3B BCBSA study just handed payers the ammunition to declare war.</description>
+    <pubDate>Mon, 13 Apr 2026 10:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep003/ep003-podcast-2026-04-12.mp3" length="13601900" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep003</guid>
+    <itunes:episode>3</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 002 — The FDA Is Moving the Goalposts on Clinical AI</title>
+    <description>The FDA is quietly rewriting the fundamental contract of clinical AI regulation — moving from a pre-market permission slip to a post-market surveillance regime — and every founder, investor, and clinician in this industry needs to understand what that means before the framework lands.</description>
+    <pubDate>Mon, 30 Mar 2026 00:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep002/ep002-podcast-2026-03-27.mp3" length="15395778" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep002</guid>
+    <itunes:episode>2</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  <item>
+    <title>Ep. 001 — Doctronic and the OxyContin Exploit</title>
+    <description>Utah handed an AI the authority to prescribe medications, a security firm broke it in a single conversation, and the FDA has never cleared a single LLM-based medical device — this week, the gap between how fast healthcare is deploying AI and how slowly the regulatory system is catching up became impossible to ignore.</description>
+    <pubDate>Mon, 23 Mar 2026 00:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/alejoeguren/vitals-and-signals/releases/download/ep001/ep001-podcast-2026-03-11.mp3" length="7187244" type="audio/mpeg"/>
+    <guid isPermaLink="false">vitals-and-signals-ep001</guid>
+    <itunes:episode>1</itunes:episode>
+    <itunes:episodeType>full</itunes:episodeType>
+  </item>
+  </channel>
+</rss>

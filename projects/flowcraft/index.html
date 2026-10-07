@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowcraft — Workflow Builder &amp; Optimizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f1e8;
+    --paper-2:#efe9dc;
+    --ink:#1d2433;
+    --ink-soft:#4a5468;
+    --ink-faint:#8b93a5;
+    --accent:#cf4a1d;          /* vermillion */
+    --accent-soft:#f3ddd2;
+    --blue:#2c5f8a;            /* blueprint blue */
+    --blue-soft:#dce8f1;
+    --green:#4a7a52;
+    --green-soft:#dfeadf;
+    --amber:#b07d24;
+    --amber-soft:#f2e7cd;
+    --line:#d8d0bf;
+    --card:#fdfbf6;
+    --shadow:0 2px 6px rgba(29,36,51,.08), 0 12px 32px rgba(29,36,51,.07);
+    --font-display:'Fraunces', Georgia, serif;
+    --font-body:'Archivo', 'Helvetica Neue', sans-serif;
+    --font-mono:'IBM Plex Mono', Consolas, monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(rgba(44,95,138,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(44,95,138,.05) 1px, transparent 1px),
+      linear-gradient(rgba(44,95,138,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(44,95,138,.08) 1px, transparent 1px);
+    background-size:24px 24px, 24px 24px, 120px 120px, 120px 120px;
+    min-height:100vh;
+    font-size:15px;
+    line-height:1.55;
+  }
+  /* ============ HEADER ============ */
+  header{
+    border-bottom:2px solid var(--ink);
+    background:var(--card);
+    padding:18px 32px 14px;
+    display:flex; align-items:baseline; gap:20px; flex-wrap:wrap;
+    position:relative;
+  }
+  header::after{
+    content:''; position:absolute; left:0; right:0; bottom:-6px; height:2px;
+    background:repeating-linear-gradient(90deg, var(--ink) 0 14px, transparent 14px 22px);
+    opacity:.25;
+  }
+  .brand{
+    font-family:var(--font-display);
+    font-weight:900; font-size:30px; letter-spacing:.02em;
+  }
+  .brand em{font-style:italic; color:var(--accent); font-weight:600;}
+  .tagline{
+    font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.14em;
+  }
+  .header-actions{margin-left:auto; display:flex; gap:10px; align-items:center;}
+  /* ============ LAYOUT ============ */
+  .shell{max-width:1240px; margin:0 auto; padding:34px 32px 90px; display:flex; gap:36px; align-items:flex-start;}
+  /* sidebar progress */
+  .side{
+    width:220px; flex-shrink:0; position:sticky; top:28px;
+  }
+  .side-title{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px;
+  }
+  .stepnav{list-style:none; border-left:2px solid var(--line);}
+  .stepnav li{
+    padding:9px 0 9px 18px; position:relative; cursor:pointer;
+    font-size:13.5px; color:var(--ink-faint); transition:color .2s;
+  }
+  .stepnav li::before{
+    content:''; position:absolute; left:-6px; top:14px; width:10px; height:10px;
+    border-radius:50%; background:var(--paper); border:2px solid var(--line);
+    transition:all .2s;
+  }
+  .stepnav li.done{color:var(--ink-soft);}
+  .stepnav li.done::before{background:var(--green); border-color:var(--green);}
+  .stepnav li.active{color:var(--ink); font-weight:600;}
+  .stepnav li.active::before{background:var(--accent); border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft);}
+  .stepnav .num{font-family:var(--font-mono); font-size:10px; margin-right:7px; opacity:.7;}
+  .side-note{
+    margin-top:26px; padding:14px 16px; background:var(--amber-soft);
+    border:1px solid #e0cfa4; font-size:12.5px; color:#6d5417; line-height:1.5;
+    transform:rotate(-.6deg);
+  }
+  .side-note strong{display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:5px;}
+  /* main panel */
+  main{flex:1; min-width:0;}
+  .panel{
+    background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow);
+    padding:36px 40px 32px; position:relative;
+    animation:rise .45s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;}}
+  .panel::before{
+    content:attr(data-index);
+    position:absolute; top:-16px; left:-14px;
+    font-family:var(--font-display); font-weight:900; font-size:52px;
+    color:var(--accent); line-height:1;
+    text-shadow:2px 2px 0 var(--card);
+  }
+  .q-kicker{font-family:var(--font-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--blue); margin-bottom:8px;}
+  h2{font-family:var(--font-display); font-weight:700; font-size:27px; line-height:1.2; margin-bottom:8px;}
+  .q-help{color:var(--ink-soft); font-size:14px; margin-bottom:24px; max-width:60ch;}
+  label{display:block; font-weight:600; font-size:13px; margin:18px 0 6px; letter-spacing:.02em;}
+  label .opt{font-weight:400; color:var(--ink-faint); font-size:12px;}
+  .field-row{display:flex; gap:8px; align-items:flex-start;}
+  input[type=text], input[type=number], textarea, select{
+    width:100%; font-family:var(--font-body); font-size:14.5px; color:var(--ink);
+    background:#fff; border:1px solid var(--line); border-bottom:2px solid var(--ink-soft);
+    padding:10px 12px; outline:none; transition:border-color .15s, box-shadow .15s;
+    border-radius:2px;
+  }
+  textarea{resize:vertical; min-height:74px;}
+  input:focus, textarea:focus, select:focus{border-bottom-color:var(--accent); box-shadow:0 2px 0 0 var(--accent-soft);}
+  select{cursor:pointer;}
+  /* mic button */
+  .mic{
+    flex-shrink:0; width:41px; height:41px; border-radius:50%;
+    border:1.5px solid var(--ink-soft); background:#fff; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    transition:all .2s; color:var(--ink-soft);
+  }
+  .mic:hover{border-color:var(--accent); color:var(--accent);}
+  .mic.listening{
+    background:var(--accent); border-color:var(--accent); color:#fff;
+    animation:pulse 1.2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(207,74,29,.45);}
+    70%{box-shadow:0 0 0 12px rgba(207,74,29,0);}
+    100%{box-shadow:0 0 0 0 rgba(207,74,29,0);}
+  }
+  .mic svg{width:17px; height:17px;}
+  .voice-hint{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); margin-top:5px;}
+  /* buttons */
+  .btn{
+    font-family:var(--font-body); font-weight:600; font-size:14px; cursor:pointer;
+    padding:11px 24px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper);
+    letter-spacing:.03em; transition:all .18s; border-radius:2px;
+  }
+  .btn:hover{background:var(--accent); border-color:var(--accent); transform:translateY(-1px);}
+  .btn.ghost{background:transparent; color:var(--ink);}
+  .btn.ghost:hover{background:var(--ink); color:var(--paper); transform:none;}
+  .btn.small{padding:7px 14px; font-size:12.5px;}
+  .btn.accent{background:var(--accent); border-color:var(--accent);}
+  .btn.accent:hover{background:var(--ink); border-color:var(--ink);}
+  .btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+  .panel-nav{display:flex; justify-content:space-between; margin-top:34px; padding-top:22px; border-top:1px dashed var(--line);}
+  /* steps builder table */
+  .steps-list{margin-top:10px; display:flex; flex-direction:column; gap:10px;}
+  .step-card{
+    display:grid; grid-template-columns:46px 1.6fr 1fr .9fr .9fr 64px 1fr 22px 26px;
+    gap:8px; align-items:center;
+    background:#fff; border:1px solid var(--line); padding:10px 12px;
+    border-left:4px solid var(--blue);
+    animation:rise .3s;
+  }
+  .step-card.decision{border-left-color:var(--amber);}
+  .step-card.approval{border-left-color:var(--accent);}
+  .step-card.dragover{outline:2px dashed var(--accent); outline-offset:2px;}
+  .step-card .idx{
+    font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); font-weight:600;
+    cursor:grab; user-select:none; white-space:nowrap;
+  }
+  .step-card .idx:active{cursor:grabbing;}
+  .movers{display:flex; flex-direction:column; gap:3px;}
+  .movers button{
+    border:1px solid var(--line); background:#fff; cursor:pointer; font-size:8px;
+    line-height:1; padding:4px 0; color:var(--ink-soft); border-radius:2px; width:22px;
+  }
+  .movers button:hover:not(:disabled){border-color:var(--accent); color:var(--accent);}
+  .movers button:disabled{opacity:.3; cursor:default;}
+  .step-card input, .step-card select{padding:7px 8px; font-size:13px; border-bottom-width:1px;}
+  .step-card .del{
+    border:none; background:none; cursor:pointer; color:var(--ink-faint); font-size:17px;
+    line-height:1; padding:4px; border-radius:3px;
+  }
+  .step-card .del:hover{color:var(--accent); background:var(--accent-soft);}
+  .steps-head{
+    display:grid; grid-template-columns:46px 1.6fr 1fr .9fr .9fr 64px 1fr 22px 26px; gap:8px;
+    font-family:var(--font-mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--ink-faint); padding:0 12px; margin-top:16px;
+  }
+  /* chips */
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .chip{
+    font-size:13px; padding:7px 14px; border:1px solid var(--line); background:#fff;
+    cursor:pointer; border-radius:20px; transition:all .15s; user-select:none;
+  }
+  .chip:hover{border-color:var(--ink-soft);}
+  .chip.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .chip.data{border-radius:3px; background:var(--blue-soft); border-color:#b5cede; cursor:default; font-family:var(--font-mono); font-size:12px;}
+  .chip.data b{cursor:pointer; margin-left:7px; opacity:.55; font-weight:700;}
+  .chip.data b:hover{opacity:1; color:var(--accent);}
+  /* RACI grid */
+  .raci-wrap{overflow-x:auto; margin-top:14px;}
+  table.raci{border-collapse:collapse; width:100%; background:#fff; border:1px solid var(--line);}
+  table.raci th, table.raci td{border:1px solid var(--line); padding:8px 10px; font-size:13px; text-align:center;}
+  table.raci th{background:var(--paper-2); font-family:var(--font-mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase;}
+  table.raci td.step-name{text-align:left; font-weight:600; min-width:170px; background:var(--card);}
+  table.raci td.cell{cursor:pointer; width:64px; font-weight:700; font-family:var(--font-mono); transition:background .12s; user-select:none;}
+  table.raci td.cell:hover{outline:2px solid var(--ink-soft); outline-offset:-2px;}
+  td.cell.R{background:var(--accent); color:#fff;}
+  td.cell.A{background:var(--ink); color:#fff;}
+  td.cell.AR{background:linear-gradient(135deg, var(--accent) 49%, var(--ink) 51%); color:#fff; font-size:11px;}
+  td.cell.C{background:var(--blue-soft); color:var(--blue);}
+  td.cell.I{background:var(--paper-2); color:var(--ink-faint);}
+  .raci-legend{display:flex; gap:16px; margin-top:12px; font-size:12.5px; color:var(--ink-soft); flex-wrap:wrap;}
+  .raci-legend span b{font-family:var(--font-mono); display:inline-block; width:22px; height:22px; line-height:22px; text-align:center; margin-right:6px; border-radius:3px;}
+  .lg-R b{background:var(--accent); color:#fff;} .lg-A b{background:var(--ink); color:#fff;}
+  .lg-C b{background:var(--blue-soft); color:var(--blue);} .lg-I b{background:var(--paper-2); color:var(--ink-faint); border:1px solid var(--line);}
+  .raci-warnings{margin-top:12px; display:flex; flex-direction:column; gap:6px;}
+  .raci-warnings div{font-size:12.5px; color:#8a3b12; background:var(--accent-soft); border-left:3px solid var(--accent); padding:6px 12px;}
+  .raci-ok{font-size:12.5px; color:var(--green); background:var(--green-soft); border-left:3px solid var(--green); padding:6px 12px;}
+  /* ============ OUTPUT ============ */
+  .output{display:none;}
+  .output.visible{display:block;}
+  .out-head{
+    display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap;
+    border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:26px;
+  }
+  .out-head h2{font-size:34px; margin:0;}
+  .out-goal{color:var(--ink-soft); font-size:14px; max-width:64ch; font-style:italic; font-family:var(--font-display);}
+  .score-badge{
+    margin-left:auto; text-align:center; flex-shrink:0;
+    border:2px solid var(--ink); background:var(--card); padding:10px 22px 12px;
+    position:relative; transform:rotate(1.2deg);
+  }
+  .score-badge .n{font-family:var(--font-display); font-weight:900; font-size:44px; line-height:1;}
+  .score-badge .l{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);}
+  .score-good .n{color:var(--green);} .score-mid .n{color:var(--amber);} .score-low .n{color:var(--accent);}
+  .sipoc{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--ink);
+    border:1.5px solid var(--ink); margin-bottom:30px;
+  }
+  .sipoc>div{background:var(--card); padding:12px 14px;}
+  .sipoc h4{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:5px;}
+  .sipoc p{font-size:12.5px; color:var(--ink-soft); line-height:1.45;}
+  section.out-block{margin-bottom:40px;}
+  .out-block>h3{
+    font-family:var(--font-display); font-size:21px; font-weight:700; margin-bottom:4px;
+    display:flex; align-items:baseline; gap:12px;
+  }
+  .out-block>h3 .tag{font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--blue); font-weight:500;}
+  .edit-link{
+    margin-left:auto; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+    text-transform:uppercase; border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+    padding:5px 12px; cursor:pointer; border-radius:2px; transition:all .15s; align-self:center;
+  }
+  .edit-link:hover{border-color:var(--accent); color:var(--accent);}
+  .out-block .sub{color:var(--ink-soft); font-size:13px; margin-bottom:16px;}
+  .diagram-scroll{
+    overflow-x:auto; background:#fff; border:1px solid var(--line); box-shadow:var(--shadow);
+    padding:10px 6px;
+    background-image:linear-gradient(rgba(44,95,138,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(44,95,138,.05) 1px, transparent 1px);
+    background-size:20px 20px;
+  }
+  .legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-size:12px; color:var(--ink-soft); font-family:var(--font-mono);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .sw{width:14px; height:14px; display:inline-block; border-radius:3px;}
+  /* recommendations */
+  .recs{display:flex; flex-direction:column; gap:14px;}
+  .rec{
+    background:var(--card); border:1px solid var(--line); border-left-width:5px;
+    padding:16px 20px; box-shadow:var(--shadow); display:flex; gap:16px; align-items:flex-start;
+    animation:rise .4s both;
+  }
+  .rec.high{border-left-color:var(--accent);} .rec.med{border-left-color:var(--amber);} .rec.low{border-left-color:var(--blue);}
+  .rec .sev{
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+    padding:4px 9px; border-radius:3px; flex-shrink:0; margin-top:2px; font-weight:600;
+  }
+  .rec.high .sev{background:var(--accent-soft); color:var(--accent);}
+  .rec.med .sev{background:var(--amber-soft); color:var(--amber);}
+  .rec.low .sev{background:var(--blue-soft); color:var(--blue);}
+  .rec h4{font-size:15px; margin-bottom:4px;}
+  .rec p{font-size:13.5px; color:var(--ink-soft);}
+  .rec .fw{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); margin-top:7px; display:block;}
+  .out-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;}
+  .metrics-strip{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:8px;}
+  .metric-card{background:var(--card); border:1px solid var(--line); padding:14px 16px; box-shadow:var(--shadow);}
+  .metric-card .v{font-family:var(--font-display); font-weight:700; font-size:26px;}
+  .metric-card .k{font-family:var(--font-mono); font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); margin-top:2px;}
+  /* discovery mode */
+  .disc-callout{
+    margin-top:26px; padding:14px 18px; background:var(--blue-soft); border:1px solid #b5cede;
+    font-size:13.5px; color:var(--blue); display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .disc-callout .btn{flex-shrink:0;}
+  .chatlog{
+    display:flex; flex-direction:column; gap:12px; margin:20px 0 18px;
+    max-height:440px; overflow-y:auto; padding:4px 2px;
+  }
+  .bub{max-width:82%; padding:12px 16px; font-size:14px; line-height:1.5; animation:rise .3s;}
+  .bub.q{
+    align-self:flex-start; background:var(--card); border:1px solid var(--line);
+    border-left:4px solid var(--blue); box-shadow:var(--shadow);
+  }
+  .bub.q::before{
+    content:'Interviewer'; display:block; font-family:var(--font-mono); font-size:9px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--blue); margin-bottom:4px;
+  }
+  .bub.a{align-self:flex-end; background:var(--ink); color:var(--paper); border-radius:3px;}
+  .bub.sys{
+    align-self:stretch; max-width:none; background:var(--amber-soft); border:1px dashed #d8bd7f;
+    font-size:12.5px; color:#6d5417; font-family:var(--font-mono);
+  }
+  .bub.sys ol{margin:6px 0 0 20px;}
+  /* toast */
+  #toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--ink); color:var(--paper); padding:11px 22px; font-size:13.5px;
+    border-radius:3px; transition:transform .3s; z-index:99; box-shadow:var(--shadow);
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  /* print */
+  @media print{
+    body{background:#fff;}
+    header .header-actions, .side, .wizard, .panel-nav, .out-actions, .no-print{display:none !important;}
+    .shell{padding:0; display:block; max-width:none;}
+    .output{display:block !important;}
+    .diagram-scroll{overflow:visible; box-shadow:none;}
+    .rec, .metric-card, .panel{box-shadow:none;}
+  }
+  @media (max-width:900px){
+    .shell{flex-direction:column; align-items:stretch;}
+    main{width:100%; min-width:0;}
+    .side{width:100%; position:static;}
+    .stepnav{display:flex; flex-wrap:wrap; border-left:none; gap:2px;}
+    .stepnav li{padding:6px 10px;}
+    .stepnav li::before{display:none;}
+    .steps-head{display:none;}
+    .step-card{grid-template-columns:1fr 1fr;}
+    .sipoc{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">FLOW<em>CRAFT</em></div>
+  <div class="tagline">Interview &rarr; Diagram &rarr; Optimization</div>
+  <div class="header-actions no-print">
+    <button class="btn ghost small" id="btnExample">Load example</button>
+    <button class="btn ghost small" id="btnImport">Import</button>
+    <button class="btn ghost small" id="btnExport">Save file</button>
+    <button class="btn ghost small" id="btnReset">Start over</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none">
+  </div>
+</header>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="side no-print">
+    <div class="side-title">The Interview</div>
+    <ul class="stepnav" id="stepnav">
+      <li data-step="0"><span class="num">01</span>Goal &amp; scope</li>
+      <li data-step="1"><span class="num">02</span>Map the steps</li>
+      <li data-step="2"><span class="num">03</span>People &amp; RACI</li>
+      <li data-step="3"><span class="num">04</span>Data &amp; feedback</li>
+      <li data-step="4"><span class="num">05</span>Pain points</li>
+      <li data-step="5"><span class="num">06</span>Blueprint</li>
+    </ul>
+    <div class="side-note">
+      <strong>Voice input</strong>
+      Tap any <em>mic</em> button and speak your answer. Works best in Chrome or Edge. Your work auto-saves in this browser.
+    </div>
+  </aside>
+
+  <main>
+  <!-- ==================== WIZARD ==================== -->
+  <div class="wizard" id="wizard">
+
+    <!-- STEP 0: GOAL -->
+    <div class="panel" data-index="01" data-panel="0">
+      <div class="q-kicker">Question 01 · Purpose</div>
+      <h2>What is the goal of this workflow?</h2>
+      <p class="q-help">Every good process map starts by naming the outcome and who it serves — before any boxes get drawn. This becomes the top line of your SIPOC scope.</p>
+
+      <label>Workflow name</label>
+      <div class="field-row">
+        <input type="text" id="fName" placeholder="e.g., New client onboarding">
+        <button class="mic" data-target="fName" title="Dictate"></button>
+      </div>
+
+      <label>What is the goal? What does "done and successful" look like?</label>
+      <div class="field-row">
+        <textarea id="fGoal" placeholder="e.g., Every new client is fully onboarded within 5 business days, with signed agreement, intake data captured, and kickoff scheduled."></textarea>
+        <button class="mic" data-target="fGoal" title="Dictate"></button>
+      </div>
+
+      <label>What is the final output or deliverable?</label>
+      <div class="field-row">
+        <input type="text" id="fOutput" placeholder="e.g., Active client record + scheduled kickoff meeting">
+        <button class="mic" data-target="fOutput" title="Dictate"></button>
+      </div>
+
+      <label>Who is the customer of this output? <span class="opt">(internal or external)</span></label>
+      <div class="field-row">
+        <input type="text" id="fCustomer" placeholder="e.g., The client, and the delivery team who takes over">
+        <button class="mic" data-target="fCustomer" title="Dictate"></button>
+      </div>
+      <div class="disc-callout">
+        <span><b>Fuzzy on the details?</b> Most people don't know their own workflow — they know stories about it. I'll ask questions and reconstruct the real process from how it actually happened last time.</span>
+        <button class="btn small accent" id="btnDiscovery">Start discovery interview &rarr;</button>
+      </div>
+
+      <div class="panel-nav">
+        <span></span>
+        <button class="btn" data-nav="1">Next: map the steps &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: STEPS -->
+    <div class="panel" data-index="02" data-panel="1" style="display:none">
+      <div class="q-kicker">Question 02 · Sequence</div>
+      <h2>Walk me through the steps, in order.</h2>
+      <p class="q-help">For each step: what happens, who owns it, what kind of step it is, whether it's manual, and roughly how long the work takes. Handoffs and manual work are where most waste hides — be honest here.</p>
+
+      <div class="field-row">
+        <input type="text" id="quickStep" placeholder='Quick add — say or type a step, e.g., "Send intake form to client"'>
+        <button class="mic" data-target="quickStep" title="Dictate"></button>
+        <button class="btn small" id="btnAddStep" style="align-self:center">+ Add</button>
+      </div>
+
+      <div class="steps-head">
+        <span>#</span><span>Step</span><span>Owner / role</span><span>Type</span><span>Mode</span><span>Mins</span><span>Tool used</span><span></span><span></span>
+      </div>
+      <div class="steps-list" id="stepsList"></div>
+
+      <div class="panel-nav">
+        <button class="btn ghost" data-nav="0">&larr; Back</button>
+        <button class="btn" data-nav="2">Next: people &amp; RACI &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: RACI -->
+    <div class="panel" data-index="03" data-panel="2">
+      <div class="q-kicker">Question 03 · Accountability</div>
+      <h2>Who does what — and who owns it?</h2>
+      <p class="q-help">Click any cell to cycle through <b>R</b>&nbsp;&rarr;&nbsp;<b>A</b>&nbsp;&rarr;&nbsp;<b>A/R</b>&nbsp;&rarr;&nbsp;<b>C</b>&nbsp;&rarr;&nbsp;<b>I</b>&nbsp;&rarr;&nbsp;blank. The two golden rules: every step needs <b>at least one R</b> (does the work) and <b>exactly one A</b> (owns the outcome). Use A/R when the same person does it and owns it. Owners you entered are pre-filled as R.</p>
+
+      <label>Add a role or person <span class="opt">(anyone consulted or informed, even if they do no steps)</span></label>
+      <div class="field-row" style="max-width:420px">
+        <input type="text" id="newRole" placeholder="e.g., Practice manager">
+        <button class="mic" data-target="newRole" title="Dictate"></button>
+        <button class="btn small" id="btnAddRole" style="align-self:center">+ Add</button>
+      </div>
+
+      <div class="raci-wrap" id="raciWrap"></div>
+      <div class="raci-legend">
+        <span class="lg-R"><b>R</b>Responsible — does the work</span>
+        <span class="lg-A"><b>A</b>Accountable — owns the outcome (one per step)</span>
+        <span class="lg-A"><b style="background:linear-gradient(135deg,var(--accent) 49%,var(--ink) 51%);font-size:9px">A/R</b>Does it and owns it</span>
+        <span class="lg-C"><b>C</b>Consulted — input before, two-way</span>
+        <span class="lg-I"><b>I</b>Informed — told after, one-way</span>
+      </div>
+      <div class="raci-warnings" id="raciWarnings"></div>
+
+      <div class="panel-nav">
+        <button class="btn ghost" data-nav="1">&larr; Back</button>
+        <button class="btn" data-nav="3">Next: data &amp; feedback &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: DATA -->
+    <div class="panel" data-index="04" data-panel="3" style="display:none">
+      <div class="q-kicker">Question 04 · Measurement</div>
+      <h2>What data tells you this is working?</h2>
+      <p class="q-help">A workflow without a feedback loop can't improve. Name the data points you want to capture, the single metric that defines success, and how often you'll actually look at it.</p>
+
+      <label>Data points to capture <span class="opt">(add one at a time)</span></label>
+      <div class="field-row" style="max-width:520px">
+        <input type="text" id="newData" placeholder="e.g., Days from signup to kickoff">
+        <button class="mic" data-target="newData" title="Dictate"></button>
+        <button class="btn small" id="btnAddData" style="align-self:center">+ Add</button>
+      </div>
+      <div class="chips" id="dataChips"></div>
+
+      <label>Primary success metric (the one number that matters)</label>
+      <div class="field-row">
+        <input type="text" id="fMetric" placeholder="e.g., % of clients onboarded within 5 business days">
+        <button class="mic" data-target="fMetric" title="Dictate"></button>
+      </div>
+
+      <label>How often do you get an update on this data?</label>
+      <select id="fCadence" style="max-width:320px">
+        <option value="">— choose a review cadence —</option>
+        <option value="realtime">Real-time / dashboard</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="adhoc">Ad hoc / when something breaks</option>
+        <option value="none">We don't review it today</option>
+      </select>
+
+      <label>Target cycle time for the whole workflow <span class="opt">(optional)</span></label>
+      <div class="field-row" style="max-width:420px">
+        <input type="text" id="fCycle" placeholder="e.g., 5 business days">
+        <button class="mic" data-target="fCycle" title="Dictate"></button>
+      </div>
+
+      <div class="panel-nav">
+        <button class="btn ghost" data-nav="2">&larr; Back</button>
+        <button class="btn" data-nav="4">Next: pain points &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: PAIN -->
+    <div class="panel" data-index="05" data-panel="4" style="display:none">
+      <div class="q-kicker">Question 05 · Friction</div>
+      <h2>Where does it hurt today?</h2>
+      <p class="q-help">Select everything that applies. These sharpen the optimization recommendations — each one maps to a known lean countermeasure.</p>
+      <div class="chips" id="painChips"></div>
+
+      <label style="margin-top:26px">Anything else I should know? <span class="opt">(optional)</span></label>
+      <div class="field-row">
+        <textarea id="fNotes" placeholder="Context, constraints, past attempts to fix it…"></textarea>
+        <button class="mic" data-target="fNotes" title="Dictate"></button>
+      </div>
+
+      <div class="panel-nav">
+        <button class="btn ghost" data-nav="3">&larr; Back</button>
+        <button class="btn accent" id="btnGenerate">Generate blueprint &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DISCOVERY ==================== -->
+  <div class="panel" id="discovery" data-index="?" style="display:none">
+    <div class="q-kicker">Discovery interview · uncover the real process</div>
+    <h2>Let's find the workflow together.</h2>
+    <p class="q-help">Answer in plain language — type or tap the mic and just talk. I'm after how it <i>actually</i> happens, not how it's supposed to happen. Messy answers are the good ones.</p>
+
+    <div class="chatlog" id="chatlog"></div>
+
+    <div class="field-row">
+      <textarea id="discAnswer" placeholder="Answer here — Enter to send, Shift+Enter for a new line."></textarea>
+      <button class="mic" data-target="discAnswer" title="Dictate"></button>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap">
+      <button class="btn" id="discSend">Answer &rarr;</button>
+      <button class="btn ghost small" id="discSkip">Skip this question</button>
+      <button class="btn ghost small" id="discQuit" style="margin-left:auto">Exit discovery</button>
+    </div>
+  </div>
+
+  <!-- ==================== OUTPUT ==================== -->
+  <div class="output" id="output"></div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ================================================================
+   FLOWCRAFT — state
+================================================================ */
+const PAIN_OPTIONS = [
+  'Things sit waiting between steps','Unclear who owns decisions','Too much manual data entry',
+  'Work gets redone / errors bounce back','Too many approvals','Information lives in email threads',
+  'Depends on one person','Clients chase us for status','Steps get skipped when busy','No visibility into where things stand'
+];
+const LANE_COLORS = ['#2c5f8a','#cf4a1d','#4a7a52','#b07d24','#6b4a8a','#8a2c50','#3a7d7b','#5a5f2c'];
+
+let state = defaultState();
+let currentPanel = 0;
+
+function defaultState(){
+  return {
+    name:'', goal:'', output:'', customer:'',
+    steps:[],           // {id,name,role,type,mode,minutes,tool}
+    extraRoles:[],
+    raci:{},            // stepId -> {role: 'R'|'A'|'C'|'I'}
+    dataPoints:[], metric:'', cadence:'', cycle:'',
+    pains:[], notes:''
+  };
+}
+let stepSeq = 1;
+const uid = () => 's' + (stepSeq++);
+
+/* ---------- persistence ---------- */
+function save(){ localStorage.setItem('flowcraft', JSON.stringify({state, stepSeq})); }
+function load(){
+  try{
+    const raw = localStorage.getItem('flowcraft');
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(data && data.state){ state = Object.assign(defaultState(), data.state); stepSeq = data.stepSeq || 100; }
+  }catch(e){}
+}
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function roles(){
+  const set = [];
+  state.steps.forEach(s => { const r = (s.role||'').trim(); if(r && !set.some(x=>x.toLowerCase()===r.toLowerCase())) set.push(r); });
+  state.extraRoles.forEach(r => { if(r && !set.some(x=>x.toLowerCase()===r.toLowerCase())) set.push(r); });
+  return set;
+}
+
+/* ================================================================
+   WIZARD navigation
+================================================================ */
+function goTo(n){
+  syncFields();
+  currentPanel = n;
+  document.querySelectorAll('[data-panel]').forEach(p => p.style.display = (+p.dataset.panel === n ? '' : 'none'));
+  $('output').classList.remove('visible');
+  const dv = document.getElementById('discovery');
+  if(dv){ dv.style.display = 'none'; disc.on = false; }
+  $('wizard').style.display = '';
+  document.querySelectorAll('#stepnav li').forEach(li => {
+    const i = +li.dataset.step;
+    li.classList.toggle('active', i === n);
+    li.classList.toggle('done', i < n);
+  });
+  if(n === 1) renderSteps();
+  if(n === 2){ renderRaci(); }
+  if(n === 3) renderDataChips();
+  if(n === 4) renderPainChips();
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => goTo(+b.dataset.nav)));
+document.querySelectorAll('#stepnav li').forEach(li => li.addEventListener('click', () => {
+  const n = +li.dataset.step;
+  if(n === 5){ generate(); } else goTo(n);
+}));
+
+/* pull text inputs into state */
+function syncFields(){
+  state.name = $('fName').value.trim();
+  state.goal = $('fGoal').value.trim();
+  state.output = $('fOutput').value.trim();
+  state.customer = $('fCustomer').value.trim();
+  state.metric = $('fMetric').value.trim();
+  state.cadence = $('fCadence').value;
+  state.cycle = $('fCycle').value.trim();
+  state.notes = $('fNotes').value.trim();
+  save();
+}
+function pushFields(){
+  $('fName').value = state.name; $('fGoal').value = state.goal;
+  $('fOutput').value = state.output; $('fCustomer').value = state.customer;
+  $('fMetric').value = state.metric; $('fCadence').value = state.cadence;
+  $('fCycle').value = state.cycle; $('fNotes').value = state.notes;
+}
+
+/* ================================================================
+   STEP BUILDER
+================================================================ */
+function addStep(name){
+  state.steps.push({id:uid(), name:name||'', role:'', type:'task', mode:'manual', minutes:'', tool:''});
+  renderSteps(); save();
+}
+$('btnAddStep').addEventListener('click', () => {
+  const v = $('quickStep').value.trim();
+  addStep(v); $('quickStep').value=''; $('quickStep').focus();
+});
+$('quickStep').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); $('btnAddStep').click(); } });
+
+function renderSteps(){
+  const box = $('stepsList');
+  if(!state.steps.length){
+    box.innerHTML = '<div style="padding:26px;text-align:center;color:var(--ink-faint);border:1.5px dashed var(--line);font-size:13.5px">No steps yet — add the first thing that happens when this workflow kicks off.</div>';
+    return;
+  }
+  box.innerHTML = state.steps.map((s,i) => `
+    <div class="step-card ${s.type}" data-id="${s.id}">
+      <span class="idx" draggable="true" title="Drag to reorder">&#10495; ${String(i+1).padStart(2,'0')}</span>
+      <input type="text" data-f="name" value="${esc(s.name)}" placeholder="What happens?">
+      <input type="text" data-f="role" value="${esc(s.role)}" placeholder="Who does it?" list="roleList">
+      <select data-f="type">
+        <option value="task" ${s.type==='task'?'selected':''}>Task</option>
+        <option value="decision" ${s.type==='decision'?'selected':''}>Decision</option>
+        <option value="approval" ${s.type==='approval'?'selected':''}>Approval</option>
+      </select>
+      <select data-f="mode">
+        <option value="manual" ${s.mode==='manual'?'selected':''}>Manual</option>
+        <option value="partial" ${s.mode==='partial'?'selected':''}>Partly auto</option>
+        <option value="auto" ${s.mode==='auto'?'selected':''}>Automated</option>
+      </select>
+      <input type="number" data-f="minutes" value="${esc(s.minutes)}" placeholder="min" min="0">
+      <input type="text" data-f="tool" value="${esc(s.tool)}" placeholder="Email, EHR, sheet…">
+      <span class="movers">
+        <button data-mv="-1" title="Move up" ${i===0?'disabled':''}>&#9650;</button>
+        <button data-mv="1" title="Move down" ${i===state.steps.length-1?'disabled':''}>&#9660;</button>
+      </span>
+      <button class="del" title="Remove step">&times;</button>
+    </div>`).join('') + `<datalist id="roleList">${roles().map(r=>`<option value="${esc(r)}">`).join('')}</datalist>`;
+
+  box.querySelectorAll('.step-card').forEach(card => {
+    const step = state.steps.find(s => s.id === card.dataset.id);
+    card.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('change', () => {
+      step[inp.dataset.f] = inp.value.trim();
+      if(inp.dataset.f==='type'){ card.className = 'step-card ' + step.type; }
+      save();
+    }));
+    card.querySelector('.del').addEventListener('click', () => {
+      state.steps = state.steps.filter(s => s.id !== step.id);
+      delete state.raci[step.id];
+      renderSteps(); save();
+    });
+    card.querySelectorAll('.movers button').forEach(b => b.addEventListener('click', () => {
+      const from = state.steps.indexOf(step), to = from + (+b.dataset.mv);
+      if(to < 0 || to >= state.steps.length) return;
+      state.steps.splice(from, 1); state.steps.splice(to, 0, step);
+      renderSteps(); save();
+    }));
+    /* drag to reorder (handle = the index badge) */
+    card.querySelector('.idx').addEventListener('dragstart', e => {
+      dragStepId = step.id;
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('dragover'); });
+    card.addEventListener('dragleave', () => card.classList.remove('dragover'));
+    card.addEventListener('drop', e => {
+      e.preventDefault(); card.classList.remove('dragover');
+      if(!dragStepId || dragStepId === step.id) return;
+      const dragged = state.steps.find(s => s.id === dragStepId);
+      state.steps.splice(state.steps.indexOf(dragged), 1);
+      state.steps.splice(state.steps.indexOf(step) + (e.offsetY > card.offsetHeight/2 ? 1 : 0), 0, dragged);
+      dragStepId = null;
+      renderSteps(); save();
+    });
+  });
+}
+let dragStepId = null;
+
+/* ================================================================
+   RACI
+================================================================ */
+const RACI_CYCLE = ['R','A','AR','C','I',''];
+const raciLabel = v => v==='AR' ? 'A/R' : (v||'');
+const hasR = vals => vals.some(v => v==='R' || v==='AR');
+const countA = vals => vals.filter(v => v==='A' || v==='AR').length;
+function raciOf(stepId){ return state.raci[stepId] || (state.raci[stepId] = {}); }
+
+function seedRaci(){
+  state.steps.forEach(s => {
+    const m = raciOf(s.id);
+    const r = (s.role||'').trim();
+    if(r && !Object.values(m).includes('R') ){
+      const key = roles().find(x=>x.toLowerCase()===r.toLowerCase());
+      if(key && !m[key]) m[key] = 'R';
+    }
+  });
+}
+$('btnAddRole').addEventListener('click', () => {
+  const v = $('newRole').value.trim();
+  if(!v) return;
+  if(roles().some(r=>r.toLowerCase()===v.toLowerCase())){ toast('That role is already on the chart'); return; }
+  state.extraRoles.push(v); $('newRole').value='';
+  renderRaci(); save();
+});
+$('newRole').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); $('btnAddRole').click(); } });
+
+function renderRaci(){
+  seedRaci();
+  const rs = roles();
+  const wrap = $('raciWrap');
+  if(!state.steps.length){ wrap.innerHTML = '<p style="color:var(--ink-faint);padding:18px 0">Add steps first (question 02), then assign roles here.</p>'; $('raciWarnings').innerHTML=''; return; }
+  if(!rs.length){ wrap.innerHTML = '<p style="color:var(--ink-faint);padding:18px 0">Add at least one role or set owners on your steps.</p>'; $('raciWarnings').innerHTML=''; return; }
+  wrap.innerHTML = `<table class="raci">
+    <thead><tr><th style="text-align:left">Step</th>${rs.map(r=>`<th>${esc(r)}</th>`).join('')}</tr></thead>
+    <tbody>${state.steps.map((s,i)=>`<tr>
+      <td class="step-name">${String(i+1).padStart(2,'0')} · ${esc(s.name)||'<i>untitled</i>'}</td>
+      ${rs.map(r=>{ const v = raciOf(s.id)[r]||''; return `<td class="cell ${v}" data-step="${s.id}" data-role="${esc(r)}">${raciLabel(v)}</td>`; }).join('')}
+    </tr>`).join('')}</tbody></table>`;
+  wrap.querySelectorAll('td.cell').forEach(td => td.addEventListener('click', () => {
+    const m = raciOf(td.dataset.step);
+    const cur = m[td.dataset.role] || '';
+    const next = RACI_CYCLE[(RACI_CYCLE.indexOf(cur)+1) % RACI_CYCLE.length];
+    if(next) m[td.dataset.role] = next; else delete m[td.dataset.role];
+    td.className = 'cell ' + next; td.textContent = raciLabel(next);
+    renderRaciWarnings(); save();
+  }));
+  renderRaciWarnings();
+}
+function raciIssues(){
+  const issues = [];
+  state.steps.forEach((s,i) => {
+    const vals = Object.values(raciOf(s.id));
+    const label = `Step ${String(i+1).padStart(2,'0')} “${s.name||'untitled'}”`;
+    if(!hasR(vals)) issues.push(`${label} has no R — nobody is doing the work.`);
+    const aCount = countA(vals);
+    if(aCount === 0) issues.push(`${label} has no A — nobody owns the outcome.`);
+    if(aCount > 1) issues.push(`${label} has ${aCount} A's — shared accountability is no accountability. Pick one.`);
+  });
+  return issues;
+}
+function renderRaciWarnings(){
+  const issues = raciIssues();
+  $('raciWarnings').innerHTML = issues.length
+    ? issues.map(i=>`<div>${esc(i)}</div>`).join('')
+    : '<div class="raci-ok">Clean chart — every step has an R and exactly one A. Textbook.</div>';
+}
+
+/* ================================================================
+   DATA CHIPS + PAIN CHIPS
+================================================================ */
+$('btnAddData').addEventListener('click', () => {
+  const v = $('newData').value.trim();
+  if(!v) return;
+  state.dataPoints.push(v); $('newData').value=''; renderDataChips(); save();
+});
+$('newData').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); $('btnAddData').click(); } });
+function renderDataChips(){
+  $('dataChips').innerHTML = state.dataPoints.map((d,i)=>`<span class="chip data">${esc(d)}<b data-i="${i}" title="remove">&times;</b></span>`).join('')
+    || '<span style="color:var(--ink-faint);font-size:12.5px">Nothing captured yet.</span>';
+  $('dataChips').querySelectorAll('b').forEach(b => b.addEventListener('click', () => {
+    state.dataPoints.splice(+b.dataset.i,1); renderDataChips(); save();
+  }));
+}
+function renderPainChips(){
+  $('painChips').innerHTML = PAIN_OPTIONS.map(p =>
+    `<span class="chip ${state.pains.includes(p)?'on':''}">${esc(p)}</span>`).join('');
+  $('painChips').querySelectorAll('.chip').forEach((c,i) => c.addEventListener('click', () => {
+    const p = PAIN_OPTIONS[i];
+    state.pains.includes(p) ? state.pains = state.pains.filter(x=>x!==p) : state.pains.push(p);
+    c.classList.toggle('on'); save();
+  }));
+}
+
+/* ================================================================
+   VOICE INPUT (Web Speech API)
+================================================================ */
+const MIC_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+(function initVoice(){
+  document.querySelectorAll('.mic').forEach(b => b.innerHTML = MIC_SVG);
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    document.querySelectorAll('.mic').forEach(b => { b.disabled = true; b.title = 'Voice input needs Chrome or Edge'; b.style.opacity=.35; });
+    return;
+  }
+  let active = null, rec = null;
+  document.querySelectorAll('.mic').forEach(btn => btn.addEventListener('click', () => {
+    if(active === btn){ rec.stop(); return; }
+    if(rec) rec.stop();
+    const field = $(btn.dataset.target);
+    rec = new SR();
+    rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = true;
+    const base = field.value ? field.value.replace(/\s+$/,'') + ' ' : '';
+    rec.onresult = e => {
+      let txt = '';
+      for(const r of e.results) txt += r[0].transcript;
+      field.value = base + txt.trim();
+    };
+    rec.onend = () => { btn.classList.remove('listening'); active = null; field.dispatchEvent(new Event('change')); syncFields(); };
+    rec.onerror = ev => { if(ev.error==='not-allowed') toast('Microphone blocked — allow mic access in the browser bar.'); };
+    rec.start();
+    btn.classList.add('listening'); active = btn;
+    toast('Listening… tap the mic again to stop.');
+  }));
+})();
+
+/* ================================================================
+   DISCOVERY MODE — reconstruct the workflow from a story
+================================================================ */
+const disc = { on:false, queue:[], cur:null, draft:null };
+const NEGATIVE = /^(no|none|nope|nothing|not really|n\/a|na|nah|it doesn'?t|can'?t think)/i;
+
+function bubble(kind, html){
+  const log = $('chatlog');
+  const d = document.createElement('div');
+  d.className = 'bub ' + kind;
+  d.innerHTML = html;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+function discAsk(q){
+  disc.cur = q;
+  bubble('q', q.text);
+  $('discAnswer').focus();
+}
+function discNext(){
+  if(disc.queue.length) discAsk(disc.queue.shift());
+  else discFinish();
+}
+function discStart(){
+  syncFields();
+  disc.on = true; disc.queue = [];
+  disc.draft = { steps:[], pains:[], notes:[] };
+  $('wizard').style.display = 'none';
+  $('output').classList.remove('visible');
+  $('discovery').style.display = '';
+  $('chatlog').innerHTML = '';
+  document.querySelectorAll('#stepnav li').forEach(li => li.classList.remove('active','done'));
+  bubble('q', "We'll reconstruct this workflow from how it <b>actually happens</b> — stories first, boxes later. To start: in a sentence or two, what is this workflow, and what should it achieve when it works?");
+  disc.cur = { id:'goal' };
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* --- narrative → draft steps --- */
+const SEQ_SPLIT = /(?:[.!?;\n]+|\band then\b|\bthen\b|\bafter that\b|\bafterwards?\b|\bat that point\b|\bonce that(?:'s| is)? done\b|\bnext\b|\bfirst\b|\bsecondly?\b|\bthirdly?\b|\bfinally\b|\blastly\b|\beventually\b)/gi;
+const ROLE_LEX = /^(?:the\s+|our\s+|my\s+)?(front desk|practice owner|office manager|manager|owner|admin(?:istrator)?|assistant|receptionist|client|patient|customer|billing|bookkeeper|accountant|doctor|nurse|therapist|clinician|practitioner|coordinator|scheduler|team|vendor|attorney|lawyer|i|we|she|he|they)\b/i;
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
+function parseNarrative(text){
+  return text.split(SEQ_SPLIT)
+    .map(s => (s||'').trim().replace(/^(?:(?:and|so|well|also|basically|usually|normally|okay|ok|um|uh)\b[,\s]*)+/i,'').trim())
+    .filter(s => s && s.split(/\s+/).length >= 2 && /[a-z]/i.test(s))
+    .slice(0, 15)
+    .map(frag => {
+      let role = '';
+      const m = frag.match(ROLE_LEX);
+      if(m){
+        const w = m[1].toLowerCase();
+        role = (w==='i' || w==='we') ? 'Me' : (w==='she' || w==='he' || w==='they') ? '' : cap(m[1]);
+      }
+      return { name: cap(frag).slice(0, 90), role };
+    });
+}
+
+/* --- answer handlers per question --- */
+function discHandle(ans){
+  const q = disc.cur;
+  const skipped = ans === null;
+  switch(q.id){
+    case 'goal':
+      if(!skipped){
+        if(!state.goal) state.goal = ans;
+        if(!state.name) state.name = ans.split(/[,.—-]/)[0].slice(0, 60);
+        pushFields(); save();
+      }
+      discAsk({ id:'trigger', text:"Got it. What <b>kicks it off</b>? An email arriving, a phone call, a form, a date on the calendar — what's the very first signal that this workflow needs to run?" });
+      return;
+    case 'trigger':
+      if(!skipped && !NEGATIVE.test(ans)){
+        const t = parseNarrative(ans)[0] || { name: cap(ans).slice(0, 80), role: '' };
+        disc.draft.steps.push({ name: 'Trigger — ' + t.name.slice(0, 78), role: t.role });
+      }
+      discAsk({ id:'story', text:"Now the important one. Think of the <b>last time</b> this actually ran — a real case. Tell me the story from that trigger to done, step by step. Don't clean it up: include the waiting, the chasing, the double-checking. Long answers are perfect (the mic helps here)." });
+      return;
+    case 'story': {
+      if(skipped){ discNext(); return; }
+      const steps = parseNarrative(ans);
+      if(!steps.length){
+        discAsk({ id:'story', text:"I couldn't pick distinct steps out of that. Try telling it as a chain: “First …, then …, then …, and finally …”" });
+        return;
+      }
+      disc.draft.steps.push(...steps);
+      bubble('sys', `I heard <b>${steps.length} step${steps.length>1?'s':''}</b>:<ol>${steps.map(s=>`<li>${esc(s.name)}${s.role?` <i>(${esc(s.role)})</i>`:''}</li>`).join('')}</ol>Rough is fine — you'll refine these in the step editor. A few gap-filling questions next.`);
+      disc.draft.steps.forEach((s, i) => {
+        if(!s.role && disc.queue.filter(x=>x.id==='owner').length < 4)
+          disc.queue.push({ id:'owner', idx:i, text:`Who actually does this one: <b>“${esc(s.name)}”</b>? A role or a name.` });
+      });
+      disc.queue.push(
+        { id:'shadow', text:"Now the unofficial stuff. Is there any <b>chasing, reminding, re-checking, or work-arounds</b> that happen but aren't part of the “official” process? Describe them — or say “none”." },
+        { id:'wait',   text:"Where does work most often <b>sit and wait</b>? Between which steps, and waiting on whom?" },
+        { id:'wrong',  text:"Think of a time it went <b>wrong or stalled</b>. What happened, and who had to fix it?" },
+        { id:'done',   text:"Last one: how do you <b>know it's finished</b>? What's the final deliverable, and who receives it?" }
+      );
+      discNext();
+      return;
+    }
+    case 'owner':
+      if(!skipped && !NEGATIVE.test(ans))
+        disc.draft.steps[q.idx].role = cap(ans.replace(/^(?:the|our|my|it'?s|that'?s|usually)\s+/i,'').split(/[,.]/)[0].trim()).slice(0, 30);
+      discNext(); return;
+    case 'shadow': {
+      if(!skipped && !NEGATIVE.test(ans)){
+        const extra = parseNarrative(ans);
+        disc.draft.steps.push(...extra.map(s => ({...s, name: s.name + ' (shadow work)'})));
+        disc.draft.pains.push('Steps get skipped when busy');
+        if(extra.length) bubble('sys', `Added ${extra.length} shadow-work step${extra.length>1?'s':''} — these are usually where the real time goes.`);
+      }
+      discNext(); return;
+    }
+    case 'wait':
+      if(!skipped && !NEGATIVE.test(ans)){
+        disc.draft.pains.push('Things sit waiting between steps');
+        disc.draft.notes.push('Waiting: ' + ans);
+      }
+      discNext(); return;
+    case 'wrong':
+      if(!skipped && !NEGATIVE.test(ans)){
+        if(/(redo|redid|rework|error|mistake|wrong|bounce|again)/i.test(ans)) disc.draft.pains.push('Work gets redone / errors bounce back');
+        if(/(chase|remind|follow)/i.test(ans)) disc.draft.pains.push('Clients chase us for status');
+        disc.draft.notes.push('Failure story: ' + ans);
+      }
+      discNext(); return;
+    case 'done':
+      if(!skipped && !NEGATIVE.test(ans) && !state.output){ state.output = ans.slice(0, 120); pushFields(); }
+      discFinish(); return;
+  }
+}
+
+function discFinish(){
+  const d = disc.draft;
+  d.steps.forEach(s => state.steps.push({ id:uid(), name:s.name, role:s.role||'', type:/approv|sign.?off|review/i.test(s.name)?'approval':/decide|decision|qualify|choose|whether/i.test(s.name)?'decision':'task', mode:'manual', minutes:'', tool:'' }));
+  d.pains.forEach(p => { if(!state.pains.includes(p)) state.pains.push(p); });
+  if(d.notes.length) state.notes = (state.notes ? state.notes + '\n' : '') + d.notes.join('\n');
+  pushFields(); save();
+  disc.on = false;
+  $('discovery').style.display = 'none';
+  goTo(1);
+  toast(`Discovery complete — ${d.steps.length} draft steps loaded. Tighten them up here.`);
+}
+
+$('btnDiscovery').addEventListener('click', discStart);
+$('discSend').addEventListener('click', () => {
+  const v = $('discAnswer').value.trim();
+  if(!v) return;
+  bubble('a', esc(v));
+  $('discAnswer').value = '';
+  discHandle(v);
+});
+$('discAnswer').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $('discSend').click(); }
+});
+$('discSkip').addEventListener('click', () => { bubble('a', '<i>skipped</i>'); discHandle(null); });
+$('discQuit').addEventListener('click', () => {
+  if(disc.draft && disc.draft.steps.length && !confirm('Exit discovery? Draft steps found so far will be kept.')) return;
+  if(disc.draft && disc.draft.steps.length) discFinish();
+  else { disc.on = false; $('discovery').style.display = 'none'; goTo(0); }
+});
+
+/* ================================================================
+   ANALYSIS ENGINE
+================================================================ */
+function analyze(){
+  const recs = [];
+  const steps = state.steps;
+  const rs = roles();
+  const add = (sev, title, body, fw) => recs.push({sev, title, body, fw});
+
+  /* --- handoffs & flow --- */
+  let handoffs = 0, pingpong = 0;
+  const seen = [];
+  steps.forEach((s,i) => {
+    const r = (s.role||'').trim().toLowerCase();
+    if(i>0){
+      const prev = (steps[i-1].role||'').trim().toLowerCase();
+      if(r && prev && r !== prev){
+        handoffs++;
+        if(seen.includes(r) && seen[seen.length-1] !== r) pingpong++;
+      }
+    }
+    if(r && seen[seen.length-1] !== r) seen.push(r);
+  });
+  if(steps.length >= 3 && handoffs >= Math.max(3, Math.ceil(steps.length/2)))
+    add('high','Too many handoffs for the size of this workflow',
+      `The work changes hands ${handoffs} times across ${steps.length} steps. Every handoff adds queue time, context loss, and a chance for the ball to drop. Look for consecutive steps that one role could own end-to-end.`,
+      'Lean — handoff/transport waste; swimlane analysis');
+  if(pingpong > 0)
+    add('high','Work ping-pongs back to earlier roles',
+      `The flow returns to a role it already left ${pingpong} time(s). Ping-ponging usually means work is being split that should be batched, or a review is happening too late. Reorder so each role's touches are consecutive, or move the check earlier.`,
+      'Lean — flow; rework loop pattern');
+
+  /* --- approvals --- */
+  const approvals = steps.filter(s=>s.type==='approval');
+  if(approvals.length >= 2)
+    add(approvals.length>=3?'high':'med','Approval-heavy process',
+      `${approvals.length} approval gates (${approvals.map(a=>`“${a.name}”`).join(', ')}). Each gate is a queue. Ask of each: what's the worst realistic outcome if we removed it or replaced it with a spot-check after the fact? Keep only the ones with real risk attached.`,
+      'Lean — over-processing; delegation of authority');
+
+  /* --- automation candidates --- */
+  const AUTO_HINTS = /(enter|copy|update|log|send|email|schedule|remind|invoice|transfer|upload|file|record|notify|follow.?up|data)/i;
+  const manual = steps.filter(s=>s.mode==='manual');
+  const autoCand = manual.filter(s => AUTO_HINTS.test(s.name + ' ' + (s.tool||'')));
+  if(autoCand.length)
+    add('med','Automation candidates identified',
+      `These manual steps look like routine transfer/communication work a tool could do: ${autoCand.map(s=>`“${s.name}”`).join(', ')}. Rule of thumb: automate the predictable, keep humans on judgment. Start with the one that runs most often.`,
+      'Automation-first triage; standard work');
+  else if(manual.length === steps.length && steps.length >= 4)
+    add('low','Everything is manual',
+      'No step is even partially automated. That is normal for a young process — but once it stabilizes, pick the most repetitive step and template or automate it.',
+      'Standard work → automation');
+
+  /* --- bottleneck (Theory of Constraints) --- */
+  const timed = steps.filter(s=>+s.minutes > 0);
+  if(timed.length >= 3){
+    const sorted = [...timed].sort((a,b)=>+a.minutes - +b.minutes);
+    const median = +sorted[Math.floor(sorted.length/2)].minutes;
+    const worst = sorted[sorted.length-1];
+    if(+worst.minutes >= median*2.5)
+      add('med',`Likely bottleneck: “${worst.name}”`,
+        `At ~${worst.minutes} min it dwarfs your median step (~${median} min). The whole workflow moves at the speed of its slowest step — improve, split, or resource this one before touching anything else.`,
+        'Theory of Constraints — elevate the constraint');
+  }
+
+  /* --- RACI issues (aggregated) --- */
+  const noR = [], noA = [], multiA = [];
+  steps.forEach((s,i) => {
+    const vals = Object.values(raciOf(s.id));
+    const label = `${String(i+1).padStart(2,'0')} “${s.name||'untitled'}”`;
+    if(!hasR(vals)) noR.push(label);
+    const aCount = countA(vals);
+    if(aCount === 0) noA.push(label);
+    if(aCount > 1) multiA.push(label);
+  });
+  if(noR.length)
+    add('high','Steps with nobody doing the work',
+      `No Responsible (R) assigned on: ${noR.join(', ')}. These steps will happen by luck. Assign a doer to each in the People & RACI screen.`,
+      'RACI rule — ≥1 R per step');
+  if(noA.length)
+    add('high', noA.length===steps.length ? 'No step has an accountable owner' : `${noA.length} step${noA.length>1?'s':''} with no accountable owner`,
+      `No Accountable (A) on: ${noA.join(', ')}. When nobody owns the outcome, quality issues have no address. Often the fix is one person holding A for a whole phase — it doesn't need to be a different person per step.`,
+      'RACI rule — exactly 1 A per step');
+  if(multiA.length)
+    add('high','Shared accountability on some steps',
+      `More than one Accountable on: ${multiA.join(', ')}. Two owners means no owner — pick one and demote the other to C.`,
+      'RACI rule — exactly 1 A per step');
+
+  /* single point of failure / overload */
+  rs.forEach(r => {
+    const rCount = steps.filter(s => raciOf(s.id)[r] === 'R' || raciOf(s.id)[r] === 'AR').length;
+    if(steps.length >= 4 && rCount / steps.length > 0.6)
+      add('med',`“${r}” is a single point of failure`,
+        `${r} is Responsible for ${rCount} of ${steps.length} steps. If they're out, the workflow stops. Cross-train a backup for at least the time-critical steps, and document them so coverage doesn't depend on memory.`,
+        'Bus-factor / capacity balancing');
+  });
+  /* spectators */
+  rs.forEach(r => {
+    const touch = steps.some(s => raciOf(s.id)[r]);
+    if(!touch)
+      add('low',`“${r}” has no assignment`,
+        `${r} appears on the chart but has no R/A/C/I anywhere. Either give them a real role or take them off the routing — CC-everyone cultures slow decisions.`,
+        'RACI hygiene');
+  });
+  /* consulted overload */
+  state.steps.forEach((s,i) => {
+    const cCount = Object.values(raciOf(s.id)).filter(v=>v==='C').length;
+    if(cCount >= 4)
+      add('med',`Step ${String(i+1).padStart(2,'0')} consults a committee`,
+        `“${s.name}” has ${cCount} Consulted parties. Consultation is two-way and blocking — every C adds a wait. Demote the ones who only need to know to I (Informed).`,
+        'RACI — C vs I discipline');
+  });
+
+  /* --- measurement & feedback loop --- */
+  if(!state.metric)
+    add('high','No success metric defined',
+      'You can\'t optimize what you don\'t measure. Pick one number that captures the goal — usually cycle time (start → done), throughput, or a quality rate — and make it visible to everyone in the workflow.',
+      'DMAIC — Measure; "one metric that matters"');
+  if(!state.cadence || state.cadence==='none' || state.cadence==='adhoc')
+    add('high','No regular feedback loop',
+      'The data is only reviewed when something breaks (or never). Set a fixed cadence — even 15 minutes weekly — to look at the metric and ask "what stuck last week?" This single habit outperforms most tooling changes.',
+      'PDCA / kaizen cadence');
+  else if((state.cadence==='monthly'||state.cadence==='quarterly') && steps.length >= 3)
+    add('low','Review cadence may be too slow',
+      `You review ${state.cadence}. If this workflow runs weekly or more often, a monthly-or-slower review means problems compound for many cycles before anyone notices. Match review frequency to run frequency.`,
+      'Feedback-loop matching');
+  if(state.metric && !state.dataPoints.length)
+    add('med','Metric has no data feeding it',
+      `You named a success metric but no data points to capture. Decide where each number will come from at the step level — ideally captured as a by-product of doing the work, not as extra admin.`,
+      'DMAIC — Measure');
+
+  /* --- tool fragmentation --- */
+  const tools = [...new Set(steps.map(s=>(s.tool||'').trim().toLowerCase()).filter(Boolean))];
+  if(tools.length >= 4)
+    add('low','Tool sprawl',
+      `This workflow touches ${tools.length} different tools (${tools.join(', ')}). Every tool switch is a mini-handoff. See if two adjacent steps can live in the same system.`,
+      'Lean — motion waste');
+  if(steps.some(s=>/email/i.test(s.tool||'')) && state.pains.includes('Information lives in email threads'))
+    add('med','Email as a system of record',
+      'Steps run through email and you flagged that information lives in threads. Move status and data capture into a shared tracker; keep email for conversation only.',
+      'Single source of truth');
+
+  /* --- pain-point mappings --- */
+  const painMap = {
+    'Things sit waiting between steps':['med','Wait time between steps','You flagged waiting. Wait time usually exceeds work time 10:1. Add a simple SLA per handoff (e.g., "picked up within 1 business day") and a visible queue so waiting work is seen, not remembered.','Lean — waiting waste; kanban'],
+    'Work gets redone / errors bounce back':['high','Rework loop','You flagged rework. Trace the last 3 bounce-backs to their origin step and add a checklist or template at the source. Fixing quality upstream is 10x cheaper than catching it downstream.','Jidoka — build quality in'],
+    'Depends on one person':['med','Key-person dependency','You flagged single-person dependency. Turn this blueprint into a written SOP and have a backup run the process once, with the owner watching. Documentation you\'ve never tested isn\'t coverage.','Bus-factor; standard work'],
+    'Clients chase us for status':['med','No outbound status visibility','Clients asking "where is it?" is a demand signal for proactive updates. Add automated status notifications at 2–3 milestone steps — it removes interruptions and feels like better service.','Voice of customer'],
+    'Steps get skipped when busy':['med','Process erodes under load','Steps skipped under pressure are steps with no forcing function. Convert the skippable ones into a checklist embedded in the tool where the work happens, or automate them entirely.','Standard work; checklists'],
+    'No visibility into where things stand':['med','No status visibility','Nobody can see where work sits. A simple board (To do / Doing / Waiting / Done) with one card per workflow run gives you queue visibility for free.','Kanban — make work visible']
+  };
+  state.pains.forEach(p => { if(painMap[p]) add(...painMap[p]); });
+
+  /* sort: high → med → low */
+  const rank = {high:0, med:1, low:2};
+  recs.sort((a,b) => rank[a.sev]-rank[b.sev]);
+  /* score */
+  let score = 100;
+  recs.forEach(r => score -= (r.sev==='high'?12 : r.sev==='med'?7 : 3));
+  score = Math.max(18, score);
+  return {recs, score, handoffs, approvals:approvals.length, manual:manual.length};
+}
+
+/* ================================================================
+   SWIMLANE SVG RENDERER
+================================================================ */
+function renderDiagram(){
+  const steps = state.steps.filter(s=>s.name);
+  const laneNames = [];
+  steps.forEach(s => { const r=(s.role||'Unassigned').trim()||'Unassigned'; if(!laneNames.includes(r)) laneNames.push(r); });
+  if(!steps.length) return '<p style="padding:20px;color:var(--ink-faint)">No steps to draw.</p>';
+
+  const GUT=170, W=176, H=60, GAP=42, LANE=104, PADT=16;
+  const cols = steps.length;
+  const width = GUT + cols*(W+GAP) + 30;
+  const height = PADT + laneNames.length*LANE + 26;
+  const laneY = r => PADT + laneNames.indexOf(r)*LANE;
+  const cx = i => GUT + 10 + i*(W+GAP);
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" style="font-family:Archivo,sans-serif;display:block">`;
+  svg += `<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1d2433"/></marker>
+  <marker id="arrH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#cf4a1d"/></marker></defs>`;
+
+  /* lanes */
+  laneNames.forEach((r,li) => {
+    const y = laneY(r), color = LANE_COLORS[li % LANE_COLORS.length];
+    svg += `<rect x="0" y="${y}" width="${width}" height="${LANE}" fill="${li%2 ? 'rgba(29,36,51,.030)' : 'rgba(29,36,51,.012)'}"/>`;
+    svg += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#d8d0bf" stroke-width="1"/>`;
+    svg += `<rect x="0" y="${y}" width="6" height="${LANE}" fill="${color}"/>`;
+    svg += `<text x="20" y="${y+LANE/2}" dominant-baseline="middle" font-size="13" font-weight="700" fill="#1d2433">${esc(r.length>18 ? r.slice(0,17)+'…' : r)}</text>`;
+  });
+  svg += `<line x1="0" y1="${PADT+laneNames.length*LANE}" x2="${width}" y2="${PADT+laneNames.length*LANE}" stroke="#d8d0bf"/>`;
+  svg += `<line x1="${GUT-14}" y1="${PADT}" x2="${GUT-14}" y2="${PADT+laneNames.length*LANE}" stroke="#d8d0bf" stroke-dasharray="3 4"/>`;
+
+  /* connectors first (under nodes) */
+  steps.forEach((s,i) => {
+    if(i===0) return;
+    const p = steps[i-1];
+    const r1=(p.role||'Unassigned').trim()||'Unassigned', r2=(s.role||'Unassigned').trim()||'Unassigned';
+    const y1 = laneY(r1)+LANE/2, y2 = laneY(r2)+LANE/2;
+    const x1 = cx(i-1)+W, x2 = cx(i);
+    const handoff = r1.toLowerCase()!==r2.toLowerCase();
+    const stroke = handoff ? '#cf4a1d' : '#1d2433';
+    const mk = handoff ? 'arrH' : 'arr';
+    if(y1===y2){
+      svg += `<line x1="${x1}" y1="${y1}" x2="${x2-2}" y2="${y2}" stroke="${stroke}" stroke-width="1.8" marker-end="url(#${mk})"/>`;
+    } else {
+      const mx = x1 + GAP/2;
+      svg += `<path d="M${x1} ${y1} L${mx} ${y1} L${mx} ${y2} L${x2-2} ${y2}" fill="none" stroke="${stroke}" stroke-width="1.8" marker-end="url(#${mk})" ${handoff?'stroke-dasharray="none"':''}/>`;
+      if(handoff) svg += `<circle cx="${mx}" cy="${(y1+y2)/2}" r="4.5" fill="#cf4a1d"/><title>Handoff</title>`;
+    }
+  });
+
+  /* nodes */
+  steps.forEach((s,i) => {
+    const r=(s.role||'Unassigned').trim()||'Unassigned';
+    const li = laneNames.indexOf(r), color = LANE_COLORS[li % LANE_COLORS.length];
+    const x = cx(i), y = laneY(r)+LANE/2 - H/2;
+    const label = s.name.length>40 ? s.name.slice(0,39)+'…' : s.name;
+    const l1 = label.length>22 ? label.slice(0, label.lastIndexOf(' ',22)>6?label.lastIndexOf(' ',22):22) : label;
+    const l2 = label.length>22 ? label.slice(l1.length).trim() : '';
+    if(s.type==='decision'){
+      const cxm=x+W/2, cym=y+H/2, hw=W/2, hh=H/2+8;
+      svg += `<polygon points="${cxm},${cym-hh} ${cxm+hw},${cym} ${cxm},${cym+hh} ${cxm-hw},${cym}" fill="#fdf6ec" stroke="#b07d24" stroke-width="1.8"/>`;
+    } else if(s.type==='approval'){
+      svg += `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="3" fill="#fdf1ec" stroke="#cf4a1d" stroke-width="1.8"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="3" fill="none" stroke="#cf4a1d" stroke-width="1" transform="translate(3,3)" opacity=".45"/>`;
+    } else {
+      svg += `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="3" fill="#ffffff" stroke="${color}" stroke-width="1.8"/>`;
+    }
+    svg += `<text x="${x+10}" y="${y-6}" font-size="9.5" font-family="'IBM Plex Mono',monospace" fill="#8b93a5">${String(i+1).padStart(2,'0')}${s.minutes? ' · '+s.minutes+'m':''}</text>`;
+    const tx = x+W/2, ty = y+H/2;
+    if(l2){
+      svg += `<text x="${tx}" y="${ty-7}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1d2433">${esc(l1)}</text>
+              <text x="${tx}" y="${ty+8}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1d2433">${esc(l2)}</text>`;
+    } else {
+      svg += `<text x="${tx}" y="${ty+1}" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="600" fill="#1d2433">${esc(l1)}</text>`;
+    }
+    /* mode badge */
+    if(s.mode==='auto') svg += `<text x="${x+W-8}" y="${y+H-7}" text-anchor="end" font-size="10" fill="#4a7a52" font-weight="700">⚡ auto</text>`;
+    if(s.mode==='manual') svg += `<circle cx="${x+W-11}" cy="${y+H-11}" r="4" fill="none" stroke="#8b93a5" stroke-width="1.4"/><title></title>`;
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+/* ================================================================
+   GENERATE OUTPUT
+================================================================ */
+$('btnGenerate').addEventListener('click', () => generate());
+function generate(opts){
+  const keepScroll = !!(opts && opts.keepScroll === true);
+  const scrollY = window.scrollY;
+  syncFields();
+  if(!state.steps.filter(s=>s.name).length){ toast('Add at least one step first (question 02).'); goTo(1); return; }
+  seedRaci();
+  const a = analyze();
+  const rs = roles();
+  const scoreClass = a.score>=75?'score-good':a.score>=50?'score-mid':'score-low';
+  const totalMin = state.steps.reduce((t,s)=>t + (+s.minutes||0), 0);
+  const cadenceLabel = {realtime:'Real-time',daily:'Daily',weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',adhoc:'Ad hoc',none:'Not reviewed'}[state.cadence] || '—';
+
+  const out = $('output');
+  out.innerHTML = `
+    <div class="out-head">
+      <div>
+        <div class="q-kicker">Workflow blueprint · ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+        <h2>${esc(state.name||'Untitled workflow')}</h2>
+        <p class="out-goal">${esc(state.goal||'No goal stated — that\'s recommendation #1.')}</p>
+      </div>
+      <div class="score-badge ${scoreClass}"><div class="n">${a.score}</div><div class="l">Flow score / 100</div></div>
+    </div>
+
+    <div class="sipoc">
+      <div><h4>Suppliers</h4><p>${esc(rs.join(', ')||'—')}</p></div>
+      <div><h4>Inputs</h4><p>${esc(state.dataPoints.join(', ')||'—')}</p></div>
+      <div><h4>Process</h4><p>${state.steps.length} steps · ${a.handoffs} handoffs${totalMin?` · ~${totalMin} min touch time`:''}</p></div>
+      <div><h4>Output</h4><p>${esc(state.output||'—')}</p></div>
+      <div><h4>Customer</h4><p>${esc(state.customer||'—')}</p></div>
+    </div>
+
+    <div class="metrics-strip">
+      <div class="metric-card"><div class="v">${state.steps.length}</div><div class="k">Steps</div></div>
+      <div class="metric-card"><div class="v">${a.handoffs}</div><div class="k">Handoffs</div></div>
+      <div class="metric-card"><div class="v">${a.approvals}</div><div class="k">Approval gates</div></div>
+      <div class="metric-card"><div class="v">${a.manual}/${state.steps.length}</div><div class="k">Manual steps</div></div>
+      <div class="metric-card"><div class="v" style="font-size:17px;padding-top:6px">${esc(cadenceLabel)}</div><div class="k">Review cadence</div></div>
+    </div>
+
+    <section class="out-block">
+      <h3>Swimlane diagram <span class="tag">who does what, in order</span><button class="edit-link no-print" onclick="goTo(1)">&#9998; edit steps</button></h3>
+      <p class="sub">Each lane is a role. <span style="color:var(--accent);font-weight:600">Orange connectors</span> are handoffs — every one is a place work can stall.</p>
+      <div class="diagram-scroll">${renderDiagram()}</div>
+      <div class="legend">
+        <span><span class="sw" style="background:#fff;border:1.8px solid #2c5f8a"></span> task</span>
+        <span><span class="sw" style="background:#fdf6ec;border:1.8px solid #b07d24;transform:rotate(45deg)"></span> decision</span>
+        <span><span class="sw" style="background:#fdf1ec;border:1.8px solid #cf4a1d"></span> approval</span>
+        <span><span class="sw" style="background:#cf4a1d;border-radius:50%"></span> handoff</span>
+        <span>⚡ automated</span>
+      </div>
+    </section>
+
+    <section class="out-block">
+      <h3>RACI matrix <span class="tag">accountability chart</span><button class="edit-link no-print" onclick="goTo(2)">&#9998; edit roles</button></h3>
+      <p class="sub">R does the work · A owns the outcome (one per step) · C is consulted before · I is informed after. <b>Click any cell to adjust</b> — the score and findings update instantly.</p>
+      <div class="raci-wrap">${raciTableHTML()}</div>
+    </section>
+
+    <section class="out-block">
+      <h3>Optimization recommendations <span class="tag">${a.recs.length} finding${a.recs.length===1?'':'s'}</span></h3>
+      <p class="sub">Ranked by impact. Each cites the framework behind it — fix the red ones first.</p>
+      <div class="recs">${
+        a.recs.length
+        ? a.recs.map((r,i)=>`<div class="rec ${r.sev}" style="animation-delay:${i*70}ms">
+            <span class="sev">${r.sev==='high'?'Fix first':r.sev==='med'?'Improve':'Consider'}</span>
+            <div><h4>${esc(r.title)}</h4><p>${esc(r.body)}</p><span class="fw">Framework: ${esc(r.fw)}</span></div>
+          </div>`).join('')
+        : '<div class="rec low"><span class="sev">Clean</span><div><h4>No significant issues found</h4><p>This workflow is well-structured: clear ownership, measured, and reviewed. Revisit after 3 months of metric data.</p></div></div>'
+      }</div>
+    </section>
+
+    ${state.metric || state.dataPoints.length ? `<section class="out-block">
+      <h3>Measurement plan <span class="tag">the feedback loop</span><button class="edit-link no-print" onclick="goTo(3)">&#9998; edit metrics</button></h3>
+      <p class="sub">Reviewed <b>${esc(cadenceLabel.toLowerCase())}</b>${state.cycle?` · target cycle time: <b>${esc(state.cycle)}</b>`:''}</p>
+      <div class="metric-card" style="max-width:640px">
+        ${state.metric?`<p style="font-size:15px"><b>North-star metric:</b> ${esc(state.metric)}</p>`:''}
+        ${state.dataPoints.length?`<p style="font-size:13.5px;color:var(--ink-soft);margin-top:8px"><b>Data captured:</b> ${esc(state.dataPoints.join(' · '))}</p>`:''}
+      </div>
+    </section>`:''}
+
+    ${state.notes?`<section class="out-block"><h3>Notes</h3><p class="sub" style="max-width:70ch">${esc(state.notes)}</p></section>`:''}
+
+    <div class="out-actions no-print">
+      <button class="btn" onclick="window.print()">Print / save PDF</button>
+      <button class="btn ghost" id="btnSvg">Diagram &rarr; SVG</button>
+      <button class="btn ghost" id="btnPng">Diagram &rarr; PNG</button>
+      <button class="btn ghost" id="btnCsv">RACI &rarr; CSV</button>
+      <button class="btn ghost" id="btnCopySummary">Copy summary text</button>
+      <button class="btn ghost" onclick="goTo(1)">&#9998; Edit workflow</button>
+    </div>`;
+
+  $('wizard').style.display = 'none';
+  out.classList.add('visible');
+  document.querySelectorAll('#stepnav li').forEach(li => {
+    const i = +li.dataset.step;
+    li.classList.toggle('active', i===5); li.classList.toggle('done', i<5);
+  });
+  $('btnCopySummary').addEventListener('click', copySummary);
+  $('btnSvg').addEventListener('click', downloadSvg);
+  $('btnPng').addEventListener('click', downloadPng);
+  $('btnCsv').addEventListener('click', downloadCsv);
+  /* live-editable RACI on the blueprint */
+  out.querySelectorAll('td.cell[data-step]').forEach(td => td.addEventListener('click', () => {
+    const m = raciOf(td.dataset.step);
+    const cur = m[td.dataset.role] || '';
+    const next = RACI_CYCLE[(RACI_CYCLE.indexOf(cur)+1) % RACI_CYCLE.length];
+    if(next) m[td.dataset.role] = next; else delete m[td.dataset.role];
+    save();
+    generate({keepScroll:true});
+  }));
+  if(keepScroll) window.scrollTo({top:scrollY, behavior:'instant'});
+  else window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function raciTableHTML(){
+  const rs = roles();
+  if(!rs.length) return '<p style="color:var(--ink-faint)">No roles defined.</p>';
+  return `<table class="raci"><thead><tr><th style="text-align:left">Step</th>${rs.map(r=>`<th>${esc(r)}</th>`).join('')}</tr></thead>
+  <tbody>${state.steps.map((s,i)=>`<tr><td class="step-name">${String(i+1).padStart(2,'0')} · ${esc(s.name)}</td>
+  ${rs.map(r=>{const v=raciOf(s.id)[r]||'';return `<td class="cell ${v}" data-step="${s.id}" data-role="${esc(r)}" title="Click to change">${raciLabel(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+function copySummary(){
+  const a = analyze();
+  const lines = [
+    `WORKFLOW BLUEPRINT — ${state.name||'Untitled'}`,
+    `Goal: ${state.goal||'—'}`,
+    `Output: ${state.output||'—'}  →  Customer: ${state.customer||'—'}`,
+    `Flow score: ${a.score}/100 · ${state.steps.length} steps · ${a.handoffs} handoffs`,
+    '', 'STEPS:',
+    ...state.steps.map((s,i)=>`  ${String(i+1).padStart(2,'0')}. [${s.role||'?'}] ${s.name}${s.type!=='task'?` (${s.type})`:''}${s.mode==='auto'?' [automated]':''}`),
+    '', `Metric: ${state.metric||'—'} · Reviewed: ${state.cadence||'—'}`,
+    '', 'TOP RECOMMENDATIONS:',
+    ...a.recs.slice(0,5).map((r,i)=>`  ${i+1}. [${r.sev.toUpperCase()}] ${r.title} — ${r.body}`)
+  ];
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Summary copied to clipboard.'));
+}
+
+/* ================================================================
+   IMPORT / EXPORT / EXAMPLE / RESET
+================================================================ */
+const fileSlug = () => (state.name||'workflow').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'workflow';
+function dl(href, name){
+  const a = document.createElement('a');
+  a.href = href; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(href), 4000);
+}
+function downloadSvg(){
+  const svg = document.querySelector('.diagram-scroll svg');
+  if(!svg){ toast('No diagram to export.'); return; }
+  const src = '<?xml version="1.0" encoding="UTF-8"?>\n' + svg.outerHTML;
+  dl(URL.createObjectURL(new Blob([src], {type:'image/svg+xml'})), fileSlug() + '-diagram.svg');
+  toast('Diagram downloaded as SVG — opens in any browser or design tool.');
+}
+function downloadPng(){
+  const svg = document.querySelector('.diagram-scroll svg');
+  if(!svg){ toast('No diagram to export.'); return; }
+  const vb = svg.viewBox.baseVal, scale = 2;
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([svg.outerHTML], {type:'image/svg+xml'}));
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = vb.width * scale; c.height = vb.height * scale;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    c.toBlob(b => { dl(URL.createObjectURL(b), fileSlug() + '-diagram.png'); toast('Diagram downloaded as PNG (2x resolution).'); });
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast('PNG export failed — try the SVG export instead.'); };
+  img.src = url;
+}
+function downloadCsv(){
+  const rs = roles();
+  if(!rs.length || !state.steps.length){ toast('Nothing to export yet.'); return; }
+  const q = s => '"' + String(s).replace(/"/g,'""') + '"';
+  const rows = [
+    ['Step','Type','Owner','Mode','Minutes','Tool', ...rs].map(q).join(','),
+    ...state.steps.map((s,i) => [
+      `${String(i+1).padStart(2,'0')} ${s.name}`, s.type, s.role, s.mode, s.minutes, s.tool,
+      ...rs.map(r => raciLabel(raciOf(s.id)[r] || ''))
+    ].map(q).join(','))
+  ];
+  dl(URL.createObjectURL(new Blob(['﻿' + rows.join('\r\n')], {type:'text/csv;charset=utf-8'})), fileSlug() + '-raci.csv');
+  toast('RACI matrix downloaded as CSV — opens in Excel or Sheets.');
+}
+$('btnExport').addEventListener('click', () => {
+  syncFields();
+  const blob = new Blob([JSON.stringify({state, stepSeq}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.name||'workflow').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.flowcraft.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Workflow saved as JSON file.');
+});
+$('btnImport').addEventListener('click', () => $('fileImport').click());
+$('fileImport').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const data = JSON.parse(rd.result);
+      if(!data.state || !Array.isArray(data.state.steps)) throw 0;
+      state = Object.assign(defaultState(), data.state); stepSeq = data.stepSeq || 500;
+      pushFields(); goTo(0); toast('Workflow loaded.');
+    }catch(err){ toast('That file doesn\'t look like a Flowcraft export.'); }
+  };
+  rd.readAsText(f); e.target.value='';
+});
+$('btnReset').addEventListener('click', () => {
+  if(!confirm('Clear everything and start a new workflow?')) return;
+  state = defaultState(); localStorage.removeItem('flowcraft');
+  pushFields(); goTo(0); toast('Fresh drafting table.');
+});
+$('btnExample').addEventListener('click', () => {
+  state = defaultState();
+  state.name = 'New client onboarding';
+  state.goal = 'Every new client is fully onboarded within 5 business days — agreement signed, intake complete, and kickoff on the calendar.';
+  state.output = 'Active client record + scheduled kickoff session';
+  state.customer = 'The new client, and the practitioner who takes over delivery';
+  const mk = (name,role,type,mode,minutes,tool)=>({id:uid(),name,role,type,mode,minutes,tool});
+  state.steps = [
+    mk('Receive inquiry & qualify fit','Front desk','decision','manual',15,'Email'),
+    mk('Send intake form & agreement','Front desk','task','manual',10,'Email'),
+    mk('Chase client for missing paperwork','Front desk','task','manual',20,'Email'),
+    mk('Review agreement & approve','Practice owner','approval','manual',15,'Email'),
+    mk('Enter client data into system','Admin','task','manual',25,'Practice software'),
+    mk('Verify insurance / billing setup','Admin','task','manual',30,'Billing portal'),
+    mk('Owner double-checks billing setup','Practice owner','approval','manual',10,'Billing portal'),
+    mk('Schedule kickoff appointment','Front desk','task','manual',10,'Calendar'),
+    mk('Send welcome packet','Front desk','task','manual',10,'Email')
+  ];
+  state.extraRoles = ['Client'];
+  seedRaci();
+  const setR = (i,pairs)=>{ const m = raciOf(state.steps[i].id); Object.assign(m, pairs); };
+  setR(0,{'Practice owner':'A'}); setR(1,{'Client':'I','Practice owner':'A'});
+  setR(2,{'Client':'C','Practice owner':'A'}); setR(3,{'Practice owner':'AR'});
+  setR(4,{'Front desk':'C','Practice owner':'A'}); setR(5,{'Practice owner':'A'});
+  setR(6,{'Practice owner':'AR'}); setR(7,{'Client':'C','Practice owner':'A'});
+  setR(8,{'Client':'I','Practice owner':'A'});
+  state.dataPoints = ['Days from inquiry to kickoff','# of chase emails per client','% intake forms complete on first try'];
+  state.metric = '% of clients onboarded within 5 business days';
+  state.cadence = 'monthly';
+  state.cycle = '5 business days';
+  state.pains = ['Things sit waiting between steps','Too much manual data entry','Clients chase us for status','Depends on one person'];
+  state.notes = 'Front desk is one person; onboarding stalls when she is out.';
+  pushFields(); save();
+  generate();
+  toast('Example loaded — this is what a finished blueprint looks like.');
+});
+
+/* ================================================================
+   INIT
+================================================================ */
+load();
+pushFields();
+goTo(0);
+if(!state.steps.length && !state.goal){ /* first visit: leave on q1 */ }
+</script>
+</body>
+</html>

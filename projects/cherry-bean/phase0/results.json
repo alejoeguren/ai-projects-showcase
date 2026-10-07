@@ -1,0 +1,259 @@
+[
+  {
+    "bag": "archers-ethiopia-daye-bensa",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM.jpeg"
+    ],
+    "fields": {
+      "roaster": "Archers",
+      "roaster_location": null,
+      "coffee_name": "Ethiopia Daye Bensa Cold Ferment Honey Archers Lot EP",
+      "country": "Ethiopia",
+      "region_string": "Hamasho Village, Sidama Bensa",
+      "producer_or_farm": "Hamasho Village",
+      "elevation": "2,230-2,300 masl",
+      "variety": "74158",
+      "process": "Cold Ferment Honey",
+      "tasting_notes": "yuzu, peach, ginger ale, earl grey"
+    },
+    "pin": {
+      "tier": "subregion",
+      "query": "Sidama, Ethiopia",
+      "lat": 6.6507504,
+      "lon": 38.4796794,
+      "matched": "ሲዳማ ክልል Sidama سيداما, ኢትዮጵያ",
+      "place_rank": 8,
+      "trace": [
+        {
+          "tier": "farm",
+          "query": "Hamasho Village, Sidama Bensa, Ethiopia",
+          "hit": null,
+          "place_rank": null
+        },
+        {
+          "tier": "subregion",
+          "query": "Hamasho Village, Ethiopia",
+          "hit": null,
+          "place_rank": null
+        },
+        {
+          "tier": "subregion",
+          "query": "Sidama Bensa, Ethiopia",
+          "hit": null,
+          "place_rank": null
+        },
+        {
+          "tier": "subregion",
+          "query": "Hamasho, Ethiopia",
+          "hit": null,
+          "place_rank": null
+        },
+        {
+          "tier": "subregion",
+          "query": "Sidama, Ethiopia",
+          "hit": "ሲዳማ ክልል Sidama سيداما, ኢትዮጵያ",
+          "place_rank": 8
+        }
+      ]
+    }
+  },
+  {
+    "bag": "sightglass-colombia-la-magdalena",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (1).jpeg"
+    ],
+    "fields": {
+      "roaster": "Sightglass",
+      "roaster_location": null,
+      "coffee_name": "Colombia La Magdalena",
+      "country": "Colombia",
+      "region_string": "La Magdalena, Tolima",
+      "producer_or_farm": null,
+      "elevation": null,
+      "variety": null,
+      "process": null,
+      "tasting_notes": "toffee, concord grape, red apple"
+    },
+    "pin": {
+      "tier": "subregion",
+      "query": "La Magdalena, Tolima, Colombia",
+      "lat": 4.1545329,
+      "lon": -74.8702198,
+      "matched": "La Magdalena, Espinal, Centro, Tolima, RAP (Especial) Central, 733520, Colombia",
+      "place_rank": 24,
+      "trace": [
+        {
+          "tier": "subregion",
+          "query": "La Magdalena, Tolima, Colombia",
+          "hit": "La Magdalena, Espinal, Centro, Tolima, RAP (Especial) Central, 733520, Colombia",
+          "place_rank": 24
+        }
+      ]
+    }
+  },
+  {
+    "bag": "unido-geishify",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (2).jpeg"
+    ],
+    "fields": {
+      "roaster": "Unido Panama Coffee Roasters",
+      "roaster_location": "Panama",
+      "coffee_name": "Geishify (geisha espresso blend)",
+      "country": "Panama",
+      "region_string": null,
+      "producer_or_farm": null,
+      "elevation": null,
+      "variety": "60% Catuai, 40% Geisha",
+      "process": "Natural",
+      "tasting_notes": "sandia, dulce de leche, hierba limon"
+    },
+    "pin": {
+      "tier": "country",
+      "query": "Panama",
+      "lat": 8.559559,
+      "lon": -81.1308434,
+      "matched": "Panamá",
+      "place_rank": 4,
+      "trace": [
+        {
+          "tier": "country",
+          "query": "Panama",
+          "hit": "Panamá",
+          "place_rank": 4
+        }
+      ]
+    }
+  },
+  {
+    "bag": "boy-and-bear-shoondisa",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (3).jpeg"
+    ],
+    "fields": {
+      "roaster": "The Boy & The Bear",
+      "roaster_location": null,
+      "coffee_name": "Shoondisa",
+      "country": "Ethiopia",
+      "region_string": "Guji",
+      "producer_or_farm": "Sookoo Coffee",
+      "elevation": null,
+      "variety": "Ethiogibirinna 74110, Serto 74112",
+      "process": "Natural",
+      "tasting_notes": "bergamot, pear, candied lemon"
+    },
+    "pin": {
+      "tier": "subregion",
+      "query": "Guji, Ethiopia",
+      "lat": 5.5501401,
+      "lon": 39.2030529,
+      "matched": "Guji, ኦሮሚያ ክልል Oromia أوروميا, ኢትዮጵያ",
+      "place_rank": 10,
+      "trace": [
+        {
+          "tier": "farm",
+          "query": "Sookoo Coffee, Guji, Ethiopia",
+          "hit": null,
+          "place_rank": null
+        },
+        {
+          "tier": "subregion",
+          "query": "Guji, Ethiopia",
+          "hit": "Guji, ኦሮሚያ ክልል Oromia أوروميا, ኢትዮጵያ",
+          "place_rank": 10
+        }
+      ]
+    }
+  },
+  {
+    "bag": "equator-las-rosas",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (4).jpeg"
+    ],
+    "fields": {
+      "roaster": "Equator Coffees",
+      "roaster_location": null,
+      "coffee_name": "Las Rosas",
+      "country": "Colombia",
+      "region_string": "Huila",
+      "producer_or_farm": null,
+      "elevation": null,
+      "variety": "Caturra, Castillo",
+      "process": "Washed",
+      "tasting_notes": "dried cherry, date, cocoa powder"
+    },
+    "pin": {
+      "tier": "subregion",
+      "query": "Huila, Colombia",
+      "lat": 2.4738993,
+      "lon": -75.5900113,
+      "matched": "Huila, RAP (Especial) Central, Colombia",
+      "place_rank": 8,
+      "trace": [
+        {
+          "tier": "subregion",
+          "query": "Huila, Colombia",
+          "hit": "Huila, RAP (Especial) Central, Colombia",
+          "place_rank": 8
+        }
+      ]
+    }
+  },
+  {
+    "bag": "feast-palmera",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (5).jpeg"
+    ],
+    "fields": {
+      "roaster": "Feast Coffee & Culture",
+      "roaster_location": null,
+      "coffee_name": "Palmera",
+      "country": "Colombia",
+      "region_string": "Huila",
+      "producer_or_farm": null,
+      "elevation": "1600m",
+      "variety": "Caturra, Castillo",
+      "process": "Washed",
+      "tasting_notes": "molasses, nougat, orange"
+    },
+    "pin": {
+      "tier": "subregion",
+      "query": "Huila, Colombia",
+      "lat": 2.4738993,
+      "lon": -75.5900113,
+      "matched": "Huila, RAP (Especial) Central, Colombia",
+      "place_rank": 8,
+      "trace": [
+        {
+          "tier": "subregion",
+          "query": "Huila, Colombia",
+          "hit": "Huila, RAP (Especial) Central, Colombia",
+          "place_rank": 8
+        }
+      ]
+    }
+  },
+  {
+    "bag": "boy-and-bear-dynamic-espresso",
+    "images": [
+      "WhatsApp Image 2026-07-06 at 3.05.31 PM (6).jpeg"
+    ],
+    "fields": {
+      "roaster": "The Boy & The Bear",
+      "roaster_location": null,
+      "coffee_name": "Dynamic Espresso",
+      "country": null,
+      "region_string": null,
+      "producer_or_farm": null,
+      "elevation": null,
+      "variety": null,
+      "process": null,
+      "tasting_notes": "dark chocolate, caramel, red apples"
+    },
+    "pin": {
+      "tier": "failure",
+      "query": null,
+      "trace": []
+    }
+  }
+]

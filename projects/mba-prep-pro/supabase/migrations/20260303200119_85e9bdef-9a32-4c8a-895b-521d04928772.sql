@@ -1,0 +1,1 @@
+ALTER TABLE public.interview_sessions ALTER COLUMN overall_score TYPE numeric(4,2);

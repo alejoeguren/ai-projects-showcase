@@ -1,0 +1,1 @@
+UPDATE schools SET required_documents = ARRAY['resume'];

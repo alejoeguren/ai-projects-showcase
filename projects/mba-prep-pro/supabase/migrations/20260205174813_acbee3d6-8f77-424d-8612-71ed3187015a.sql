@@ -1,0 +1,1 @@
+ALTER TABLE schools ADD COLUMN interview_style text;

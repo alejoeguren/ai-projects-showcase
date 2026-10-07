@@ -1,0 +1,43 @@
+project_id = "YOUR_SUPABASE_PROJECT_REF"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+port = 54324
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://YOUR_SUPABASE_PROJECT_REF.supabase.co"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+
+[functions.chat-completion]
+verify_jwt = false
+
+[functions.process-resume]
+verify_jwt = false
+
+[functions.evaluate-interview]
+verify_jwt = false
+
+[functions.text-to-speech]
+verify_jwt = false
+
+[functions.realtime-session]
+verify_jwt = false
+
+[functions.process-school-materials]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.verify-payment]
+verify_jwt = false

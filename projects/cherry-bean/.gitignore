@@ -1,0 +1,6 @@
+node_modules/
+.claude/settings.local.json
+cherry-bean/.git-unused-starter/
+.env
+.env*
+*.log

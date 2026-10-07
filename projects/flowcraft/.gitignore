@@ -1,0 +1,5 @@
+Thumbs.db
+.DS_Store
+desktop.ini
+*.flowcraft.json
+.claude/settings.local.json
